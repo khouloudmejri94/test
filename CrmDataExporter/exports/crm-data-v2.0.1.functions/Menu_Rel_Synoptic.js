@@ -1,0 +1,1 @@
+function Menu_Rel_Synoptic(){ top.dlgWindow = ""; return top.OpenDlg("SynopticView")}

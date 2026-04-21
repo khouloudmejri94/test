@@ -1,0 +1,1 @@
+function Menu_T_SIM_Campaigner(){ return top.fraMenuBar.fctOptizenLaunch("CAMPAIGNER","0")}

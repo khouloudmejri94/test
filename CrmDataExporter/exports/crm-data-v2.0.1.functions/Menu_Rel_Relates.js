@@ -1,0 +1,1 @@
+function Menu_Rel_Relates(){ top.dlgWindow = ""; return top.OpenDlg("RelationType")}

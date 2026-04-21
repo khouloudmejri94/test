@@ -1,0 +1,1 @@
+function Menu_R_M_Save(){ return top.fraMenuBar.fctSaveRecord("Insert","",false,true)}

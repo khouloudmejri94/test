@@ -1,0 +1,1 @@
+function Menu_R_QBEOption(){ return top.OpenDlg("QBEOption","")}

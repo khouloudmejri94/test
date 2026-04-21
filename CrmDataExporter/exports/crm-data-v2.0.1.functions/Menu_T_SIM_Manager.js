@@ -1,0 +1,1 @@
+function Menu_T_SIM_Manager(){ return top.fraMenuBar.fctOptizenLaunch("MANAGER","0")}

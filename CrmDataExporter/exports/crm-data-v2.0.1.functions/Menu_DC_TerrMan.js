@@ -1,0 +1,1 @@
+function Menu_DC_TerrMan(){ return top.OpenDlg("TerritoryManagement") }

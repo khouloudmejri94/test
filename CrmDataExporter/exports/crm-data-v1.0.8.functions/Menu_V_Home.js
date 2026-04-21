@@ -1,1 +1,0 @@
-function(){ return fctOpenHome(top.UserSetting["Home"]) }

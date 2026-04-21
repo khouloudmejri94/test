@@ -1,0 +1,1 @@
+function Menu_DC_Doc_EmailTest(){ return top.fraMenuBar.fctTestEmailDoc()}

@@ -1,0 +1,1 @@
+function Menu_R_First(){ return top.fraMenuBar.fctNavigateRecord("First")}

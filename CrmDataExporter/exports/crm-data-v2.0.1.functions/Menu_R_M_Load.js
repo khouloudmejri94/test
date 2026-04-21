@@ -1,0 +1,1 @@
+function Menu_R_M_Load(){ return top.OpenDlg("Master","")}

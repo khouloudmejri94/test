@@ -1,0 +1,1 @@
+function Menu_DC_Lea_PromCpyPer(){ return top.fraMenuBar.fctAutoPromote(["Cpy","Per"])}

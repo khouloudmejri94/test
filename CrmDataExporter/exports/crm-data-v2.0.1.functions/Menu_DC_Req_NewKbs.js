@@ -1,0 +1,1 @@
+function Menu_DC_Req_NewKbs(){ top.OpenData_View("Kbs","0","New","top.MyData_View.NewKbsFromReq()")}

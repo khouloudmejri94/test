@@ -1,0 +1,1 @@
+function Menu_T_A_SQLTrace(){ return top.fraMenuBar.fctEnableSQLTrace()}

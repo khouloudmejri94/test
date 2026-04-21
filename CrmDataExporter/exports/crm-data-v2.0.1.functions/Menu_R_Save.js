@@ -1,0 +1,1 @@
+function Menu_R_Save(){ return top.fraMenuBar.fctSaveRecord()}

@@ -1,0 +1,1 @@
+function Menu_R_M_Update(){ return top.fraMenuBar.fctUpdateMaster()}

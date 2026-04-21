@@ -1,0 +1,1 @@
+function Menu_T_Print(){ return top.OpenDlg("Report")}

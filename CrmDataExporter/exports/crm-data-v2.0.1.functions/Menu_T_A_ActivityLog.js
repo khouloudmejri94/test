@@ -1,0 +1,1 @@
+function Menu_T_A_ActivityLog(){ return top.OpenDlg("ActivityLog")}

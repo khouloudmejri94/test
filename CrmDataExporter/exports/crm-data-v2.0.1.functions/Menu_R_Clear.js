@@ -1,0 +1,1 @@
+function Menu_R_Clear(){ return top.fraMenuBar.fctClear()}

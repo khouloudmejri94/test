@@ -1,0 +1,1 @@
+function Menu_O_A_NewAction(){ return top.OpenDlg("NewAcnAcy","MenuBar")}

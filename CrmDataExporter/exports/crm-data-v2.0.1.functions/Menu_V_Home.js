@@ -1,0 +1,1 @@
+function Menu_V_Home(){ return fctOpenHome(top.UserSetting["Home"]) }

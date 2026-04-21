@@ -1,0 +1,1 @@
+function Menu_DC_O_Security(){ return top.OpenDlg("SecurityInfo",top.MyApp.AppSetting.CurrentData_View)}

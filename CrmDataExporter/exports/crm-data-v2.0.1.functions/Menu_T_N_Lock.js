@@ -1,0 +1,1 @@
+function Menu_T_N_Lock(){ return top.fraMenuBar.fctLock()}

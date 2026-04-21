@@ -1,0 +1,1 @@
+function Menu_T_A_SQLHistory(){ return top.OpenDlg("SQLTrace")}

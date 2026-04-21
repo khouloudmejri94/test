@@ -1,0 +1,1 @@
+function Menu_T_ChangePassword(){ return top.OpenDlg("ChangePassword")}

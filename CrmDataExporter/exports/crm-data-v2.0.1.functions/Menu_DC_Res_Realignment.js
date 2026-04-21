@@ -1,0 +1,1 @@
+function Menu_DC_Res_Realignment(){ return top.OpenDlg("OwnerRealignement","ResName")}

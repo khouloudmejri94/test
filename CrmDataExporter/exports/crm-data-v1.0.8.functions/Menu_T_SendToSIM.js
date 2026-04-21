@@ -1,1 +1,0 @@
-function(){ return top.OpenDlg("SendToSim",[top.MyApp.CurrentSetting.CurrentNRID])}

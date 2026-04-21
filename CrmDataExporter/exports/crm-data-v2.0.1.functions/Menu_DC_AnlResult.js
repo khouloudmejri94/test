@@ -1,0 +1,1 @@
+function Menu_DC_AnlResult(){ return top.fraData_View.fctShowResult()}

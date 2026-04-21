@@ -1,1 +1,0 @@
-function(){ return top.OpenDlg("Undelete", [top.AppSetting.CurrentData_View])}

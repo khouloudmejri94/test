@@ -1,0 +1,1 @@
+function Menu_O_A_RecordSelector(){ return top.fraMenuBar.fctSendOrgToRecordSelector()}

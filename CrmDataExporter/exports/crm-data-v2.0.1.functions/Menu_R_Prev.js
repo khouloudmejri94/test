@@ -1,0 +1,1 @@
+function Menu_R_Prev(){ return top.fraMenuBar.fctNavigateRecord("Previous")}

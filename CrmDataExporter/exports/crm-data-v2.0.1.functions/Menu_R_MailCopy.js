@@ -1,0 +1,1 @@
+function Menu_R_MailCopy(){ return top.fraMenuBar.fctSaveRecord("Copy","",true)}

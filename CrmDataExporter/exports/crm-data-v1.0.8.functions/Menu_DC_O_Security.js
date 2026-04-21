@@ -1,1 +1,0 @@
-function(){ return top.OpenDlg("SecurityInfo",top.MyApp.AppSetting.CurrentData_View)}

@@ -1,0 +1,1 @@
+function Menu_T_CamExecute(){ return top.fraData_View.ifrView3.fraTabs.fctExecute()}

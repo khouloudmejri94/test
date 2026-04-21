@@ -1,0 +1,1 @@
+function Menu_T_RecordSelector(){ return top.OpenDlg("RecordSelector",undefined, top.MyApp, true)}

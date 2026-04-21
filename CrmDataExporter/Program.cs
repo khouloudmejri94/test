@@ -9,8 +9,7 @@ string version = args.Length > 0
 string tableName = args.Length > 1
     ? args[1]
     : "crs0";
-
-string outputDirectory = Path.Combine(AppContext.BaseDirectory, "exports");
+string outputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "exports");
 string? connectionString = Environment.GetEnvironmentVariable("CRM_EXPORT_CONNECTION_STRING");
 
 if (string.IsNullOrWhiteSpace(connectionString))
@@ -78,7 +77,6 @@ static async Task<string> ExportFunctionsSeparateFilesAsync(
     foreach (Dictionary<string, object?> row in rows)
     {
         string? functionName = GetStringValue(row, "function_name");
-        Console.WriteLine($"DEBUG function_name = '{functionName}'");
         string? functionText = GetStringValue(row, "function_text");
 
         if (string.IsNullOrWhiteSpace(functionText))

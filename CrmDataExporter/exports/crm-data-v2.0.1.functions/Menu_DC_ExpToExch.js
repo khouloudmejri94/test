@@ -1,0 +1,1 @@
+function Menu_DC_ExpToExch(){ return top.fraMenuBar.fctRepSynch("SynchronisationExportRecord")}

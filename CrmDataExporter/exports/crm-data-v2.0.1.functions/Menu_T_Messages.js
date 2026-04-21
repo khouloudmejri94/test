@@ -1,0 +1,1 @@
+function Menu_T_Messages() { top.MyApp.fctDisplayPushlet(top.MyApp.AppSetting.Messages_XML); }

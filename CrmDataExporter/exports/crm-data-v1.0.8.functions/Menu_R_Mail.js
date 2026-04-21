@@ -1,1 +1,0 @@
-function(){ return top.sendMail(top.CurrentSetting.Record_XML,"",true)}

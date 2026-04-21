@@ -1,0 +1,1 @@
+function Menu_DC_QuoNextStep(){ return top.fraMenuBar.fctQuoNextStep()}

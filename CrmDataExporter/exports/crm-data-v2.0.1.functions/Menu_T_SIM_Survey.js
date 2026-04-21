@@ -1,0 +1,1 @@
+function Menu_T_SIM_Survey(){ return top.fraMenuBar.fctOptizenLaunch("SURVEYMANAGER","0")}

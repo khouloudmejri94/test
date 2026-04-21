@@ -1,0 +1,1 @@
+function Menu_T_SIMCampaignHisto(){top.OpenDlg("SimHistory",[""])}

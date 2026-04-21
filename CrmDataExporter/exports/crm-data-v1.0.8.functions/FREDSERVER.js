@@ -1,4 +1,0 @@
-function(strSQL)
-{
-	return strSQL;
-}

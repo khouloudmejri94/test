@@ -1,1 +1,0 @@
-function() { top.MyApp.fctDisplayPushlet(top.MyApp.AppSetting.Messages_XML); }

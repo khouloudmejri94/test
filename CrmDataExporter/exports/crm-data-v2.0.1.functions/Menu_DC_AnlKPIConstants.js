@@ -1,0 +1,1 @@
+function Menu_DC_AnlKPIConstants(){ return top.OpenDlg("AnlKPIConstants")}

@@ -1,0 +1,1 @@
+function Menu_T_Ressource(){ return top.OpenDlg("Ressources","Application")}

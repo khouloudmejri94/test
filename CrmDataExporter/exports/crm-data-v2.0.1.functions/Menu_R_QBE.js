@@ -1,0 +1,1 @@
+function Menu_R_QBE(){ return top.fraMenuBar.fctQBE()}

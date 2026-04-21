@@ -1,0 +1,1 @@
+function Menu_DC_Lea_PromLink(){ return top.fraMenuBar.fctAutoPromote(["Cpy","Per"], top.MyApp.CurrentSetting.CurrentNRID, true)}

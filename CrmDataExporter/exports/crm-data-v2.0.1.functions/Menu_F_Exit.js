@@ -1,0 +1,1 @@
+function Menu_F_Exit(){ return top.fraMenuBar.fctExit()}

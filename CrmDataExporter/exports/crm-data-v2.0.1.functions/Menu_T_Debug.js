@@ -1,0 +1,1 @@
+function Menu_T_Debug(){top.DebugBrowser=top.window.open(top.MyApp.AppSetting.RootPath+"___DOM_Browser/debugerFrame.htm","Debugger","resizable=yes")}

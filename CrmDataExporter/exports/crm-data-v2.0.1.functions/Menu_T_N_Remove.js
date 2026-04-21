@@ -1,0 +1,1 @@
+function Menu_T_N_Remove(){ return top.fraMenuBar.fctRemoveNav()}

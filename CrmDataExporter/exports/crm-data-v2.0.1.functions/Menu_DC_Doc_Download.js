@@ -1,0 +1,1 @@
+function Menu_DC_Doc_Download(){ return top.fraMenuBar.fctDownloadDoc()}

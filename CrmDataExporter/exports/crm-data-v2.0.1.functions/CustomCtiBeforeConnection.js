@@ -1,0 +1,1 @@
+function CustomCtiBeforeConnection(){return true;}

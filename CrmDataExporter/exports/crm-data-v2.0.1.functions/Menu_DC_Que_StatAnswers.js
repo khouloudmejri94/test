@@ -1,0 +1,1 @@
+function Menu_DC_Que_StatAnswers(){ return top.MyApp.OpenDlg("StatAnswer", top.MyApp.CurrentSetting.CurrentNRID)}

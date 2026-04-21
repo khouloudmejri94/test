@@ -1,0 +1,1 @@
+function Menu_DC_QryLoad(){ return top.OpenDlg("QryName")}

@@ -1,1 +1,0 @@
-function(){ return top.OpenDlg("OwnerRealignement","ResName")}

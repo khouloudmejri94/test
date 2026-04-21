@@ -1,0 +1,1 @@
+function Menu_R_Edit(){ return top.fraMenuBar.fctEdit()}

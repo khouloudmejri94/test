@@ -1,1 +1,0 @@
-function(){ top.OpenView("Cam","Steps","","ifrView3")}

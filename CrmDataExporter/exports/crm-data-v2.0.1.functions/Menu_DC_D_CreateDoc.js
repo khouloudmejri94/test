@@ -1,0 +1,1 @@
+function Menu_DC_D_CreateDoc(){ return top.fraMenuBar.fctCreateDocument("42")}

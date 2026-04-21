@@ -1,0 +1,1 @@
+function Menu_T_Undelete(){ return top.OpenDlg("Undelete", [top.AppSetting.CurrentData_View])}

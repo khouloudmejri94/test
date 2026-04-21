@@ -1,1 +1,0 @@
-function(){ return top.MyApp.OpenDlg("StatAnswer", top.MyApp.CurrentSetting.CurrentNRID)}

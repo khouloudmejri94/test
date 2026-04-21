@@ -1,0 +1,1 @@
+function Menu_T_Synchro(){ return top.fraMenuBar.fctRepSynch("Synchronisation")}

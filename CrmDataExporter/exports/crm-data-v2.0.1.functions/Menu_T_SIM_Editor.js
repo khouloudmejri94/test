@@ -1,0 +1,1 @@
+function Menu_T_SIM_Editor(){ return top.fraMenuBar.fctOptizenLaunch("EDITOR","0")}

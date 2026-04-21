@@ -1,0 +1,1 @@
+function Menu_DC_QryViewDomain(){ return top.OpenDlg("QryDomain")}

@@ -1,0 +1,1 @@
+function Menu_T_Script(){ return top.OpenDlg("Script")}

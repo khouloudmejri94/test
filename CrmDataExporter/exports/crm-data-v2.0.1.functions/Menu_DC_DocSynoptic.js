@@ -1,0 +1,1 @@
+function Menu_DC_DocSynoptic(){ return top.OpenDlg("DocSynoptic")}

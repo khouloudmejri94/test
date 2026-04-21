@@ -1,0 +1,1 @@
+function Menu_T_A_GoogleMaps(){ return top.fraMenuBar.fctShowGoogleMaps()}

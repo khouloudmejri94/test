@@ -1,1 +1,0 @@
-function(){ return top.fctOpenIframeDialog("RelationshipsNavigator","","", true)}

@@ -1,0 +1,1 @@
+function Menu_Rel_Attach(){ top.dlgWindow = ""; return top.OpenDlg("Attach")}

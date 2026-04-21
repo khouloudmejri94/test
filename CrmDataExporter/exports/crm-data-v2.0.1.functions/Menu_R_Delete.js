@@ -1,0 +1,1 @@
+function Menu_R_Delete(){ return top.fraMenuBar.fctDelete()}

@@ -1,0 +1,1 @@
+function Menu_R_SearchOtherChap(){ return top.fraMenuBar.fctSearchOtherChap()}

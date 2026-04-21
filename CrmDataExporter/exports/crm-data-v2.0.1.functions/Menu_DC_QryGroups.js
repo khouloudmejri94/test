@@ -1,0 +1,1 @@
+function Menu_DC_QryGroups(){ return top.OpenDlg("QryGroups")}

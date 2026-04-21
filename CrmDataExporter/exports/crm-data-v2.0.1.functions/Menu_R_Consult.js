@@ -1,0 +1,1 @@
+function Menu_R_Consult(){ return top.fraMenuBar.fctConsult()}

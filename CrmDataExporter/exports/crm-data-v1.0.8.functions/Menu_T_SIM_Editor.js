@@ -1,1 +1,0 @@
-function(){ return top.fraMenuBar.fctOptizenLaunch("EDITOR","0")}

@@ -1,0 +1,1 @@
+function Menu_DC_LeaDetection(){ return top.OpenDlg("LeaTwin",true)}

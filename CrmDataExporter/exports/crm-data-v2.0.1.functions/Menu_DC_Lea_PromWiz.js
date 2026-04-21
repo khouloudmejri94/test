@@ -1,0 +1,1 @@
+function Menu_DC_Lea_PromWiz(){ return top.OpenDlg("PromotionWiz")}

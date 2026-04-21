@@ -1,0 +1,1 @@
+function CustomCtiTopEventTransfer(){return true;}

@@ -1,0 +1,1 @@
+function Menu_DC_D_LinkDoc(){ return top.fraMenuBar.fctCreateDocument("link")}

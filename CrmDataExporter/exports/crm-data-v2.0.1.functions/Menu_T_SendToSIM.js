@@ -1,0 +1,1 @@
+function Menu_T_SendToSIM(){ return top.OpenDlg("SendToSim",[top.MyApp.CurrentSetting.CurrentNRID])}

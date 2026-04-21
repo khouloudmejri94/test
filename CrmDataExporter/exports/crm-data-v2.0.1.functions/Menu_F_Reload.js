@@ -1,0 +1,1 @@
+function Menu_F_Reload(){ return top.fraMenuBar.fctReload()}

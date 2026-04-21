@@ -1,0 +1,1 @@
+function Menu_DC_Doc_Upload(){ return top.fraMenuBar.fctUploadDoc()}

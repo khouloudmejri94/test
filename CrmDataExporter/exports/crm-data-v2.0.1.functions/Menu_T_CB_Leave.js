@@ -1,0 +1,1 @@
+function Menu_T_CB_Leave(){ return top.fraMenuBar.fctNeverLeaveAfterInsertUpdate()}

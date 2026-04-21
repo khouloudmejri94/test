@@ -1,0 +1,1 @@
+function CustomCtiBeforeOpenDlg(){return true;}

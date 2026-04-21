@@ -1,0 +1,1 @@
+function Menu_R_Reset(){ return top.fraMenuBar.fctReset()}

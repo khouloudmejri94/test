@@ -1,0 +1,1 @@
+function Menu_DC_QueTest(){ return top.fraMenuBar.fctQueTest() }

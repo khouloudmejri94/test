@@ -1,0 +1,1 @@
+function Menu_R_Next(){top.fraMenuBar.fctNavigateRecord("Next")}

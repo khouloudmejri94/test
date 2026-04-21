@@ -1,0 +1,1 @@
+function Menu_R_CopyNewVersion(){ return top.fraMenuBar.fctCreateNewDocVersion()}

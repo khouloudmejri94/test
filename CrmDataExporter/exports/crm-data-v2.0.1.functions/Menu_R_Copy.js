@@ -1,0 +1,1 @@
+function Menu_R_Copy(){ return top.fraMenuBar.fctSaveRecord("Copy")}

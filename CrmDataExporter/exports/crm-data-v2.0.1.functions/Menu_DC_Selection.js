@@ -1,0 +1,1 @@
+function Menu_DC_Selection(){ return top.fraData_View.ShowSelection()}

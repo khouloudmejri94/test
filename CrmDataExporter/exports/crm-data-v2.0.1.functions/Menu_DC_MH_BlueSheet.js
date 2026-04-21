@@ -1,0 +1,1 @@
+function Menu_DC_MH_BlueSheet(){ return top.fraMenuBar.fctOpenMHSheet("Bluesheet")}

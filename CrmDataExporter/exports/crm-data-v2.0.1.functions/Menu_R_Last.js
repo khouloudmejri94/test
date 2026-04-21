@@ -1,0 +1,1 @@
+function Menu_R_Last(){ return top.fraMenuBar.fctNavigateRecord("Last")}

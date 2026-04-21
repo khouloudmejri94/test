@@ -1,0 +1,1 @@
+function Menu_R_OptionCopy(){ return top.OpenDlg("AcnOption","Copy")}

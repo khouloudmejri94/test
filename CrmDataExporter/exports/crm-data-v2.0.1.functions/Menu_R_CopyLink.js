@@ -1,0 +1,1 @@
+function Menu_R_CopyLink(){ return top.fraData_View.fctCopyLink()}

@@ -1,0 +1,1 @@
+function Menu_Hi_Back(){ top.bBack = true; execHistoryElement(top.HistoryPos-1, true); Update_MnbHistory()}

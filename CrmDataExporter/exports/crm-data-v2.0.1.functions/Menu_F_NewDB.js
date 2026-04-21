@@ -1,0 +1,1 @@
+function Menu_F_NewDB(){ return top.fraMenuBar.fctNewDB()}

@@ -1,0 +1,1 @@
+function Menu_DC_QryL_5(){ return top.fraMenuBar.fctQryLevel(5)}

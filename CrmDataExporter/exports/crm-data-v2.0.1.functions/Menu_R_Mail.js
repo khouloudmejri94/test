@@ -1,0 +1,1 @@
+function Menu_R_Mail(){ return top.sendMail(top.CurrentSetting.Record_XML,"",true)}

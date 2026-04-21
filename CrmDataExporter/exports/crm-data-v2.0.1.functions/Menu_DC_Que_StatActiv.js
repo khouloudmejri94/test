@@ -1,0 +1,1 @@
+function Menu_DC_Que_StatActiv(){ return top.MyApp.OpenDlg("StatActivity", top.MyApp.CurrentSetting.CurrentNRID);}

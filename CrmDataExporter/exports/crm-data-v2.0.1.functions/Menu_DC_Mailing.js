@@ -1,0 +1,1 @@
+function Menu_DC_Mailing(){ return top.OpenDlg("Mailing")}

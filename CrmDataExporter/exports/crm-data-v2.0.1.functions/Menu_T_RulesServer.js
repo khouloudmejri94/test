@@ -1,0 +1,1 @@
+function Menu_T_RulesServer(){return top.OpenDlg("RulesServer")}

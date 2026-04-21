@@ -1,0 +1,1 @@
+function Menu_DC_QueGraph(){ return top.MyApp.OpenDlg("QueSequenceGraph")}

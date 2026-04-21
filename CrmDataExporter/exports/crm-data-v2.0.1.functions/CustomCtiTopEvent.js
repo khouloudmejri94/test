@@ -1,0 +1,2 @@
+/***/
+function CustomCtiTopEvent(){return true;}

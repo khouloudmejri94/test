@@ -1,0 +1,1 @@
+function Menu_O_A_Insert(){ return top.OpenDlg("NewAcnAcy","MenuBar")}

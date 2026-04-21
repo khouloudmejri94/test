@@ -1,0 +1,1 @@
+function Menu_Rel_Navigator(){ return top.fctOpenIframeDialog("RelationshipsNavigator","","", true)}

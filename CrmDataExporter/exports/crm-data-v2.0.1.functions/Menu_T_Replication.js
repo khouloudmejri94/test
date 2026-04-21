@@ -1,0 +1,1 @@
+function Menu_T_Replication(){ return top.fraMenuBar.fctRepSynch("Replication")}

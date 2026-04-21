@@ -1,0 +1,1 @@
+function CustomCtiBeforeAction(){return true;}

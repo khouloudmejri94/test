@@ -1,0 +1,1 @@
+function Menu_DC_AnlProcess(){ return top.fraData_View.fctProcess()}

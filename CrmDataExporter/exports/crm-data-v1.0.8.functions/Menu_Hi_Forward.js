@@ -1,1 +1,0 @@
-function(){ top.bForward = true; execHistoryElement(top.HistoryPos-1, true); Update_MnbHistory()}

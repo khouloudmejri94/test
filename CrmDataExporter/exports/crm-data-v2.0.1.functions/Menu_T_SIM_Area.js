@@ -1,0 +1,1 @@
+function Menu_T_SIM_Area(){ return top.fraMenuBar.fctOptizenLaunch("AREAMANAGER","0")}
