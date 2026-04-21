@@ -10,13 +10,6 @@ public sealed class CrmExportService
         WriteIndented = true
     };
 
-    public async Task<ExportManifest> ExportAsync(
-        IReadOnlyCollection<CrmRecord> records,
-        string outputDirectory,
-        string version,
-        CancellationToken cancellationToken = default)
-        => await ExportAsyncInternal(records, records.Count, outputDirectory, version, cancellationToken);
-
     public async Task<ExportManifest> ExportRawAsync(
         IReadOnlyCollection<Dictionary<string, object?>> rows,
         string outputDirectory,

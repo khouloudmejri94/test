@@ -1,7 +1,7 @@
 {
-  "Version": "v2.0.1",
-  "CreatedAtUtc": "2026-04-21T09:47:16.3947521Z",
-  "DataFile": "crm-data-v2.0.1.json",
+  "Version": "v1.0.0",
+  "CreatedAtUtc": "2026-04-21T10:26:54.9980631Z",
+  "DataFile": "crm-data-v1.0.0.json",
   "ChecksumSha256": "a1b272a4ac93925d0816422e964f4c54b6979079390f6d2c92ad5745a625f333",
   "RecordCount": 707
 }

@@ -2,20 +2,19 @@
 using Microsoft.Data.SqlClient;
 using CrmDataExporter.Services;
 
-string version = args.Length > 0
-    ? args[0]
-    : $"v{DateTime.UtcNow:yyyy.MM.dd.HHmmss}";
+
 
 string tableName = args.Length > 1
     ? args[1]
-    : "crs0";
+    : "sysadm.scr0";
 string outputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "exports");
 string? connectionString = Environment.GetEnvironmentVariable("CRM_EXPORT_CONNECTION_STRING");
-
+string version = args.Length > 0
+    ? args[0]
+    : GetNextVersion(outputDirectory);
 if (string.IsNullOrWhiteSpace(connectionString))
 {
     Console.Error.WriteLine("Variable manquante: CRM_EXPORT_CONNECTION_STRING");
-    Console.Error.WriteLine("Exemple:");
     Console.Error.WriteLine("setx CRM_EXPORT_CONNECTION_STRING \"Server=MONSERVEUR;Database=MaBase;Trusted_Connection=True;TrustServerCertificate=True;\"");
     return;
 }
@@ -143,7 +142,26 @@ static string? GetStringValue(Dictionary<string, object?> row, string key)
 
     return Convert.ToString(value);
 }
+static string GetNextVersion(string outputDirectory)
+{
+    if (!Directory.Exists(outputDirectory))
+        return "v1.0.0";
 
+    var versions = Directory.GetFiles(outputDirectory, "crm-data-v*.json")
+        .Select(f => Path.GetFileNameWithoutExtension(f)) // crm-data-v2.0.1
+        .Select(name => name.Replace("crm-data-v", ""))   // 2.0.1
+        .Select(v => Version.TryParse(v, out var parsed) ? parsed : null)
+        .Where(v => v != null)
+        .Select(v => v!)
+        .OrderByDescending(v => v)
+        .FirstOrDefault();
+
+    if (versions == null)
+        return "v1.0.0";
+
+    // Incrémente le patch (3ème chiffre)
+    return $"v{versions.Major}.{versions.Minor}.{versions.Build + 1}";
+}
 static string BuildSafeSqlTableName(string tableName)
 {
     if (string.IsNullOrWhiteSpace(tableName))
