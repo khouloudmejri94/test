@@ -78,6 +78,7 @@ static async Task<string> ExportFunctionsSeparateFilesAsync(
     foreach (Dictionary<string, object?> row in rows)
     {
         string? functionName = GetStringValue(row, "function_name");
+        Console.WriteLine($"DEBUG function_name = '{functionName}'");
         string? functionText = GetStringValue(row, "function_text");
 
         if (string.IsNullOrWhiteSpace(functionText))
@@ -89,8 +90,8 @@ static async Task<string> ExportFunctionsSeparateFilesAsync(
         fallbackIndex++;
 
         string filePath = Path.Combine(directoryPath, fileName);
-        string cleanedFunctionText = RemoveFunctionName(functionText);
-        await File.WriteAllTextAsync(filePath, cleanedFunctionText);
+     
+        await File.WriteAllTextAsync(filePath, functionText);
     }
 
     return directoryPath;
@@ -104,7 +105,6 @@ static List<Dictionary<string, object?>> SanitizeRowsForGlobalExport(
     foreach (Dictionary<string, object?> row in rows)
     {
         var copy = new Dictionary<string, object?>(row, StringComparer.OrdinalIgnoreCase);
-        copy.Remove("function_name");
         copy.Remove("function_text");
         sanitized.Add(copy);
     }
@@ -144,14 +144,6 @@ static string? GetStringValue(Dictionary<string, object?> row, string key)
     }
 
     return Convert.ToString(value);
-}
-
-static string RemoveFunctionName(string functionText)
-{
-    return Regex.Replace(
-        functionText,
-        @"\bfunction\s+[A-Za-z_$][A-Za-z0-9_$]*\s*\(",
-        "function(");
 }
 
 static string BuildSafeSqlTableName(string tableName)
