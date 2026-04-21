@@ -1,0 +1,1 @@
+function(){ return top.OpenData_View("Social", top.AppSetting.CurrentData_View + "_" + top.AppSetting.CurrentNRID) }

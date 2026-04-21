@@ -1,0 +1,1 @@
+function(){ top.dlgWindow = ""; return top.OpenDlg("RelationType")}

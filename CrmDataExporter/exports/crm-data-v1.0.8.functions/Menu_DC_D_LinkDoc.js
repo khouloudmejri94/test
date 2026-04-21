@@ -1,0 +1,1 @@
+function(){ return top.fraMenuBar.fctCreateDocument("link")}

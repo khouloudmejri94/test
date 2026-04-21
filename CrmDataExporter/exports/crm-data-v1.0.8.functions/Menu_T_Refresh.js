@@ -1,0 +1,1 @@
+function(){top.OpenData_View(top.AppSetting.CurrentData_View,top.AppSetting[top.AppSetting.CurrentData_View].nChapMode=="New"?"0":((top.AppSetting.CurrentData_View=="Per" && top.AppSetting["Per"].PerCpyNRID)?top.AppSetting["Per"].PerCpyNRID:top.AppSetting[top.AppSetting.CurrentData_View].CurrentNRID),top.AppSetting[top.AppSetting.CurrentData_View].nChapMode,"","true")}

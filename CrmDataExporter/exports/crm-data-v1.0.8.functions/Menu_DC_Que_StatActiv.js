@@ -1,0 +1,1 @@
+function(){ return top.MyApp.OpenDlg("StatActivity", top.MyApp.CurrentSetting.CurrentNRID);}

@@ -1,0 +1,1 @@
+function(){ return top.OpenDlg("RecordSelector",undefined, top.MyApp, true)}

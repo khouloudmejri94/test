@@ -1,0 +1,1 @@
+function(){ return top.fraData_View.fctShowResult()}

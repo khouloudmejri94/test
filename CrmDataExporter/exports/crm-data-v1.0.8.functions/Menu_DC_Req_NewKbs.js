@@ -1,0 +1,1 @@
+function(){ top.OpenData_View("Kbs","0","New","top.MyData_View.NewKbsFromReq()")}

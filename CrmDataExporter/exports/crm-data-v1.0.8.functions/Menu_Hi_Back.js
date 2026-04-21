@@ -1,0 +1,1 @@
+function(){ top.bBack = true; execHistoryElement(top.HistoryPos-1, true); Update_MnbHistory()}
