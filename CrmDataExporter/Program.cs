@@ -1,24 +1,28 @@
 ﻿using CrmDataExporter.Commands;
 
-string outputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "exports");
+string outputDirectory = Path.GetFullPath(
+    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "exports"));
+
 string? connectionString = Environment.GetEnvironmentVariable("CRM_EXPORT_CONNECTION_STRING");
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
     Console.Error.WriteLine("Variable manquante: CRM_EXPORT_CONNECTION_STRING");
-    Console.Error.WriteLine(
-        "setx CRM_EXPORT_CONNECTION_STRING \"Server=MONSERVEUR;Database=MaBase;Trusted_Connection=True;TrustServerCertificate=True;\"");
+    Console.Error.WriteLine("setx CRM_EXPORT_CONNECTION_STRING \"Server=...;Database=...;Trusted_Connection=True;TrustServerCertificate=True;\"");
     return;
 }
 
-string command = args.Length > 0 ? args[0] : "import";
-string version = args.Length > 1
-    ? args[1]
-    : command == "import"
-        ? GetLatestVersion(outputDirectory)
-        : GetNextVersion(outputDirectory);
+string command   = args.Length > 0 ? args[0] : "import";
+string version   = args.Length > 1 ? args[1] : command == "import"
+    ? GetLatestVersion(outputDirectory)
+    : GetNextVersion(outputDirectory);
 string tableName = args.Length > 2 ? args[2] : "sysadm.scr0";
 
+// Log de diagnostic
+Console.WriteLine($"[INFO] Répertoire exports : {outputDirectory}");
+Console.WriteLine($"[INFO] Commande           : {command}");
+Console.WriteLine($"[INFO] Version            : {version}");
+Console.WriteLine($"[INFO] Table              : {tableName}");
 
 switch (command)
 {
@@ -38,9 +42,10 @@ switch (command)
 static string GetLatestVersion(string outputDirectory)
 {
     if (!Directory.Exists(outputDirectory))
-        throw new Exception("Dossier exports introuvable");
+        throw new Exception($"Dossier exports introuvable : {outputDirectory}");
 
     var latest = Directory.GetFiles(outputDirectory, "crm-data-v*.json")
+        .Where(f => !Path.GetFileName(f).StartsWith("crm-data-manifest-")) // ← exclure manifests
         .Select(Path.GetFileNameWithoutExtension)
         .Select(name => name?.Replace("crm-data-v", ""))
         .Select(v => Version.TryParse(v, out var parsed) ? parsed : null)
@@ -50,7 +55,7 @@ static string GetLatestVersion(string outputDirectory)
         .FirstOrDefault();
 
     if (latest == null)
-        throw new Exception("Aucun fichier d'export trouvé");
+        throw new Exception($"Aucun fichier crm-data-v*.json trouvé dans : {outputDirectory}");
 
     return $"v{latest.Major}.{latest.Minor}.{latest.Build}";
 }
@@ -61,6 +66,7 @@ static string GetNextVersion(string outputDirectory)
         return "v1.0.0";
 
     var latest = Directory.GetFiles(outputDirectory, "crm-data-v*.json")
+        .Where(f => !Path.GetFileName(f).StartsWith("crm-data-manifest-")) // ← exclure manifests
         .Select(Path.GetFileNameWithoutExtension)
         .Select(name => name?.Replace("crm-data-v", ""))
         .Select(v => Version.TryParse(v, out var parsed) ? parsed : null)

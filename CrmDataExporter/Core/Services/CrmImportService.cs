@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using Microsoft.Data.SqlClient;
 using CrmDataExporter.Models;
+using Microsoft.Data.SqlClient;
 
-namespace CrmDataExporter.Services;
+namespace CrmDataExporter.Core.Services;
 
 /// <summary>
 /// Service responsable de l'import des enregistrements CRM depuis le système de fichiers exporter vers la BD.
@@ -55,23 +55,39 @@ public sealed class CrmImportService
         {
             foreach (CrmRecord record in records)
             {
-                // Vérifie si l'enregistrement existe déjà en base via son nrid
                 bool exists = await RecordExistsAsync(connection, transaction, safeTableName, record.Nrid);
 
                 if (exists)
                 {
-                    await UpdateRecordAsync(connection, transaction, safeTableName, record);
+                    // Récupère le function_text actuel depuis la base
+                    string? currentFunctionText = await GetFunctionTextAsync(
+                        connection, transaction, safeTableName, record.Nrid);
+
+                    // Compare l'ancien et le nouveau function_text
+                    bool functionTextChanged = !string.Equals(
+                        currentFunctionText,
+                        record.FunctionText,
+                        StringComparison.Ordinal);
+
+                    // Dmod = maintenant si modifié, sinon on garde l'ancienne valeur
+                    DateTime? newDmod = functionTextChanged ? DateTime.UtcNow : record.Dmod;
+
+                    await UpdateRecordAsync(connection, transaction, safeTableName, newDmod ?? DateTime.UtcNow, record);
                     updated++;
-                    Console.WriteLine($"  [UPDATE] nrid={record.Nrid} | {record.FunctionName ?? "-"}");
+
+                    if (functionTextChanged)
+                        Console.WriteLine($"  [UPDATE] ✓ Modifié  : {record.FunctionName ?? "-"} | dmod={newDmod:yyyy-MM-dd HH:mm:ss}");
+                    else
+                        Console.WriteLine($"  [UPDATE] = Inchangé : {record.FunctionName ?? "-"}");
                 }
+                
                 else
                 {
                     await InsertRecordAsync(connection, transaction, safeTableName, record);
                     inserted++;
-                    Console.WriteLine($"  [INSERT] nrid={record.Nrid} | {record.FunctionName ?? "-"}");
+                    Console.WriteLine($"  [INSERT] {record.FunctionName ?? "-"}");
                 }
             }
-
             // Valide toutes les opérations si aucune erreur
             await transaction.CommitAsync();
             Console.WriteLine("Transaction validée (COMMIT).");
@@ -92,11 +108,43 @@ public sealed class CrmImportService
             Total    = inserted + updated
         };
     }
+    
+    /// <summary>
+    /// Récupère le contenu du champ function_text depuis la base de données
+    /// pour un enregistrement identifié par son nrid.
+    /// </summary>
+    /// <param name="connection">Connexion SQL Server déjà ouverte.</param>
+    /// <param name="transaction">Transaction en cours pour garantir la cohérence des données.</param>
+    /// <param name="tableName">Nom de la table cible (ex: [sysadm].[scr0]).</param>
+    /// <param name="nrid">Identifiant unique de l’enregistrement.</param>
+    /// <returns>
+    /// Le contenu de function_text si présent en base,
+    /// sinon null si la valeur est NULL ou inexistante.
+    /// </returns> 
+    private static async Task<string?> GetFunctionTextAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        string tableName,
+        string nrid)
+    {
+        string sql = $"SELECT function_text FROM {tableName} WHERE nrid = @nrid";
 
+        await using var cmd = new SqlCommand(sql, connection, transaction);
+        cmd.Parameters.AddWithValue("@nrid", nrid);
+
+        var result = await cmd.ExecuteScalarAsync();
+
+        if (result == null || result == DBNull.Value)
+            return null;
+
+        return result.ToString();
+    }
+    
     /// <summary>
     /// Désérialise le contenu JSON en liste de CrmRecord.
     /// La désérialisation est insensible à la casse des noms de propriétés.
     /// </summary>
+    
     private static List<CrmRecord> DeserializeRecords(string jsonContent)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -114,25 +162,36 @@ public sealed class CrmImportService
         string functionsDir)
     {
         if (!Directory.Exists(functionsDir))
+        {
+            Console.WriteLine($"  [WARN] Dossier introuvable : {functionsDir}");
             return records;
+        }
 
-        // Charge tous les fichiers .js en mémoire : clé = nom de fichier sans extension
         var functionTexts = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (string jsFile in Directory.GetFiles(functionsDir, "*.js"))
         {
             string funcName = Path.GetFileNameWithoutExtension(jsFile);
             functionTexts[funcName] = await File.ReadAllTextAsync(jsFile);
+            Console.WriteLine($"  [JS chargé] '{funcName}'");
         }
 
-        // Recrée chaque record en y injectant le function_text correspondant (with = copie non-destructive)
+        Console.WriteLine($"  [INFO] {functionTexts.Count} fichiers .js chargés");
+        Console.WriteLine($"  [INFO] {records.Count} records à merger");
+
         return records.Select(r =>
         {
+            Console.WriteLine($"  [RECORD] FunctionName='{r.FunctionName}'");
+        
             if (r.FunctionName != null && functionTexts.TryGetValue(r.FunctionName, out string? text))
+            {
+                Console.WriteLine($"  [MERGE] ✓ Match : '{r.FunctionName}' — {text.Length} chars");
                 return r with { FunctionText = text };
+            }
+
+            Console.WriteLine($"  [MERGE] ✗ Pas de match pour : '{r.FunctionName}'");
             return r;
         }).ToList();
     }
-
     /// <summary>
     /// Vérifie si un enregistrement existe déjà en base en recherchant par nrid.
     /// </summary>
@@ -185,30 +244,37 @@ public sealed class CrmImportService
         SqlConnection connection,
         SqlTransaction transaction,
         string tableName,
+        DateTime dmod,
         CrmRecord r)
     {
+        // Log pour vérifier que function_text est bien présent avant l'UPDATE
+        Console.WriteLine($"  [UPDATE SQL] nrid={r.Nrid} | function_text null={r.FunctionText == null} | longueur={r.FunctionText?.Length ?? 0}");
+
         string sql = $@"
-            UPDATE {tableName} SET
-                rid                    = @rid,
-                dmod                   = @dmod,
-                rmod                   = @rmod,
-                function_name          = @function_name,
-                function_text          = @function_text,
-                title                  = @title,
-                description            = @description,
-                shortcut_description   = @shortcut_description,
-                returndesc             = @returndesc,
-                template               = @template,
-                type                   = @type,
-                browsers_compatibility = @browsers_compatibility,
-                lang_id                = @lang_id,
-                tier_id                = @tier_id,
-                img                    = @img
-            WHERE nrid = @nrid";
+    UPDATE {tableName} SET
+        rid                    = @rid,
+        dmod                   = @dmod,
+        rmod                   = @rmod,
+        function_name          = @function_name,
+        function_text          = @function_text,
+        title                  = @title,
+        description            = @description,
+        shortcut_description   = @shortcut_description,
+        returndesc             = @returndesc,
+        template               = @template,
+        type                   = @type,
+        browsers_compatibility = @browsers_compatibility,
+        lang_id                = @lang_id,
+        tier_id                = @tier_id,
+        img                    = @img
+    WHERE nrid = @nrid";
 
         await using var cmd = new SqlCommand(sql, connection, transaction);
         AddParameters(cmd, r);
-        await cmd.ExecuteNonQueryAsync();
+        cmd.Parameters["@dmod"].Value = dmod;
+
+        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+        Console.WriteLine($"  [UPDATE SQL] rows affected = {rowsAffected}");
     }
 
     /// <summary>
