@@ -1,4 +1,4 @@
-﻿
+
 
 using CrmDataExporter.Core.Services;
 
@@ -21,5 +21,13 @@ public static class ImportCommand
         Console.WriteLine($"  Insérés    : {result.Inserted}");
         Console.WriteLine($"  Mis à jour : {result.Updated}");
         Console.WriteLine($"  Total      : {result.Total}");
+
+        // Sauvegarder la date et le résultat de l'import
+        string manifestPath = Path.Combine(outputDirectory, $"crm-import-manifest-{version}.json");
+        string manifestContent = System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        await File.WriteAllTextAsync(manifestPath, manifestContent);
+        
+        Console.WriteLine($"  Date       : {result.ImportedAtUtc:O}");
+        Console.WriteLine($"  Fichier    : {manifestPath}");
     }
 }

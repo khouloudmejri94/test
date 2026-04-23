@@ -2,7 +2,7 @@ function WS_Send_New_Submission_Notifications()
 {
 	
 	
-	    var MyQryObj = CreateSelligentObject("SqlHelper", CurrentSessionID);
+	    //var MyQryObj = CreateSelligentObject("SqlHelper");
 	
 	    var vCount = 0;
 	    var vRetour = "OK";
@@ -25,7 +25,7 @@ function WS_Send_New_Submission_Notifications()
 	            + "INNER JOIN sysadm.am0 ON am0.titulaire = so0.titulaire "
 	            + "WHERE Is_Notified IS NULL";
 	        Selligent.Library.Monitor.Tracer.Write(vSQL);
-	        var xmlDoc = InitXml(MyQryObj.ExecuteSql(vSQL));
+	        var xmlDoc = InitXml(objSqlHelper.ExecuteSql(vSQL));
 	        Selligent.Library.Monitor.Tracer.Write(MyQryObj.ExecuteSql(vSQL));
 	        var nodes = FindItem("Flds", xmlDoc, true);
 	
@@ -78,9 +78,9 @@ function WS_Send_New_Submission_Notifications()
 	            // =========================
 	            // UPDATE FLAG
 	            // =========================
-	            MyQryObj.ExecuteSql(
+	            /*MyQryObj.ExecuteSql(
 	                "UPDATE dbo.FormSubmissions SET Is_Notified = 1 WHERE SubmissionID = " + submissionId
-	            );
+	            );*/
 	            Selligent.Library.Monitor.Tracer.Write("3");
 	
 	            vCount++;
@@ -100,10 +100,10 @@ function WS_Send_New_Submission_Notifications()
 	        // =========================
 	        var safeRetour = vRetour.replace(/'/g, "''");
 	
-	        MyQryObj.ExecuteSql(
+	        /*MyQryObj.ExecuteSql(
 	            "INSERT INTO xlog_ws (xmethod, xretour, xdate_log) " +
 	            "VALUES ('WS_Send_New_Submission_Notifications', '" + safeRetour + "', GETDATE())"
-	        );
+	        );*/
 	
 	        if (MyQryObj) {
 	            MyQryObj.Dispose();
