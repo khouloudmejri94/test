@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace CrmDataExporter.Core.Models;
 
@@ -95,12 +95,7 @@ public sealed record CrmRecord
     /// </summary>
     public string? Img { get; init; }
 
-    /// <summary>
-    /// Retourne une copie du record avec Dmod mis à jour à la date courante UTC.
-    /// Utilisé lors de l'import pour tracer la date de modification.
-    /// </summary>
-    public CrmRecord WithUpdatedDmod() => this with { Dmod = DateTime.UtcNow };
-    
+
     /// <summary>
     /// Mappe une ligne du SqlDataReader vers un CrmRecord.
     /// Utilise Convert.ToString pour gérer tous les types SQL sans lever d'InvalidCastException

@@ -3986,7 +3986,7 @@
   {
     "Nrid": "30548465485282",
     "Rid": "SCRMAS2013-05-02-08.36.19.997191",
-    "Dmod": "2026-04-22T09:44:40.6",
+    "Dmod": "2026-04-23T10:29:04.773",
     "Rmod": "SCRMAS2013-05-02-13.25.13.887220",
     "FunctionName": "AA_Test",
     "Title": null,
@@ -4530,7 +4530,7 @@
   {
     "Nrid": "30838270617990",
     "Rid": "SCRMAS2013-05-02-13.19.37.800491",
-    "Dmod": "2026-04-23T08:39:38.633",
+    "Dmod": "2026-04-23T10:39:48.757",
     "Rmod": "SCRMAS2013-05-02-13.25.39.683755",
     "FunctionName": "aa__Apl__Test",
     "Title": null,
@@ -11198,6 +11198,22 @@
     "BrowsersCompatibility": null,
     "LangId": "0",
     "TierId": "1"
+  },
+  {
+    "Nrid": "43321356636634",
+    "Rid": "SCRHIC2026-04-23-10.41.49.000315",
+    "Dmod": "2026-04-23T10:41:51.823",
+    "Rmod": "SCRHIC2026-04-23-10.41.51.823308",
+    "FunctionName": "Get_Session_Info",
+    "Title": null,
+    "Description": "",
+    "ShortcutDescription": "",
+    "ReturnDesc": "",
+    "Template": null,
+    "Type": "0",
+    "BrowsersCompatibility": null,
+    "LangId": "1",
+    "TierId": "2"
   },
   {
     "Nrid": "43460249578942",

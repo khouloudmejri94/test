@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using CrmDataExporter.Core.Models;
 using CrmDataExporter.Models;
 using Microsoft.Data.SqlClient;
@@ -164,7 +164,7 @@ public sealed class CrmImportService
     {
         if (!Directory.Exists(functionsDir))
         {
-            Console.WriteLine($"  [WARN] Dossier introuvable : {functionsDir}");
+            Console.WriteLine($"  [WARN] Dossier de fonctions introuvable : {functionsDir}");
             return records;
         }
 
@@ -173,23 +173,15 @@ public sealed class CrmImportService
         {
             string funcName = Path.GetFileNameWithoutExtension(jsFile);
             functionTexts[funcName] = await File.ReadAllTextAsync(jsFile);
-            Console.WriteLine($"  [JS chargé] '{funcName}'");
         }
-
-        Console.WriteLine($"  [INFO] {functionTexts.Count} fichiers .js chargés");
-        Console.WriteLine($"  [INFO] {records.Count} records à merger");
 
         return records.Select(r =>
         {
-            Console.WriteLine($"  [RECORD] FunctionName='{r.FunctionName}'");
-        
             if (r.FunctionName != null && functionTexts.TryGetValue(r.FunctionName, out string? text))
             {
-                Console.WriteLine($"  [MERGE] ✓ Match : '{r.FunctionName}' — {text.Length} chars");
                 return r with { FunctionText = text };
             }
 
-            Console.WriteLine($"  [MERGE] ✗ Pas de match pour : '{r.FunctionName}'");
             return r;
         }).ToList();
     }
@@ -248,9 +240,6 @@ public sealed class CrmImportService
         DateTime dmod,
         CrmRecord r)
     {
-        // Log pour vérifier que function_text est bien présent avant l'UPDATE
-        Console.WriteLine($"  [UPDATE SQL] nrid={r.Nrid} | function_text null={r.FunctionText == null} | longueur={r.FunctionText?.Length ?? 0}");
-
         string sql = $@"
     UPDATE {tableName} SET
         rid                    = @rid,
@@ -274,8 +263,7 @@ public sealed class CrmImportService
         AddParameters(cmd, r);
         cmd.Parameters["@dmod"].Value = dmod;
 
-        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-        Console.WriteLine($"  [UPDATE SQL] rows affected = {rowsAffected}");
+        await cmd.ExecuteNonQueryAsync();
     }
 
     /// <summary>

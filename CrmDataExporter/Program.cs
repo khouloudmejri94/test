@@ -1,4 +1,4 @@
-﻿﻿using CrmDataExporter.Commands;
+﻿using CrmDataExporter.Commands;
 
 string outputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "exports");
 string? connectionString = Environment.GetEnvironmentVariable("CRM_EXPORT_CONNECTION_STRING");
@@ -40,14 +40,7 @@ static string GetLatestVersion(string outputDirectory)
     if (!Directory.Exists(outputDirectory))
         throw new Exception("Dossier exports introuvable");
 
-    var latest = Directory.GetFiles(outputDirectory, "crm-data-v*.json")
-        .Select(Path.GetFileNameWithoutExtension)
-        .Select(name => name?.Replace("crm-data-v", ""))
-        .Select(v => Version.TryParse(v, out var parsed) ? parsed : null)
-        .Where(v => v != null)
-        .Select(v => v!)
-        .OrderByDescending(v => v)
-        .FirstOrDefault();
+    var latest = GetLatestVersionObject(outputDirectory);
 
     if (latest == null)
         throw new Exception("Aucun fichier d'export trouvé");
@@ -60,7 +53,17 @@ static string GetNextVersion(string outputDirectory)
     if (!Directory.Exists(outputDirectory))
         return "v1.0.0";
 
-    var latest = Directory.GetFiles(outputDirectory, "crm-data-v*.json")
+    var latest = GetLatestVersionObject(outputDirectory);
+
+    if (latest == null)
+        return "v1.0.0";
+
+    return $"v{latest.Major}.{latest.Minor}.{latest.Build + 1}";
+}
+
+static Version? GetLatestVersionObject(string outputDirectory)
+{
+    return Directory.GetFiles(outputDirectory, "crm-data-v*.json")
         .Select(Path.GetFileNameWithoutExtension)
         .Select(name => name?.Replace("crm-data-v", ""))
         .Select(v => Version.TryParse(v, out var parsed) ? parsed : null)
@@ -68,9 +71,4 @@ static string GetNextVersion(string outputDirectory)
         .Select(v => v!)
         .OrderByDescending(v => v)
         .FirstOrDefault();
-
-    if (latest == null)
-        return "v1.0.0";
-
-    return $"v{latest.Major}.{latest.Minor}.{latest.Build + 1}";
 }

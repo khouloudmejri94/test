@@ -1,0 +1,18 @@
+{
+  "profiles": {
+    "Run Import": {
+      "commandName": "Project",
+      "commandLineArgs": "import",
+      "environmentVariables": {
+        "CRM_EXPORT_CONNECTION_STRING": "Server=srvcrmv9dev;Database=SANDBOX;Trusted_Connection=True;TrustServerCertificate=True;"
+      }
+    },
+    "Run Export": {
+      "commandName": "Project",
+      "commandLineArgs": "export",
+      "environmentVariables": {
+        "CRM_EXPORT_CONNECTION_STRING": "Server=srvcrmv9dev;Database=SANDBOX;Trusted_Connection=True;TrustServerCertificate=True;"
+      }
+    }
+  }
+}
