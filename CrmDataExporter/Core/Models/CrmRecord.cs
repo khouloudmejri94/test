@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace CrmDataExporter.Models;
+namespace CrmDataExporter.Core.Models;
 
 /// <summary>
 /// Représente un enregistrement de la table scr0 du CRM.
@@ -22,7 +22,12 @@ public sealed record CrmRecord
     /// Identifiant de révision.
     /// </summary>
     public string? Rid { get; init; }
-    
+
+    /// <summary>
+    /// Date de dernière modification.
+    /// </summary>
+    public DateTime? Dmod { get; init; }
+
     /// <summary>
     /// Numéro de révision.
     /// </summary>
@@ -37,10 +42,7 @@ public sealed record CrmRecord
     /// Identifiant du niveau (tier) associé.
     /// </summary>
     public string? TierId { get; init; }
-    
-    /// <summary>Date de dernière modification. Mise à jour automatiquement lors de l'import.</summary>
-    public DateTime? Dmod { get; init; }
-    
+
     /// <summary>
     /// Nom de la fonction JavaScript (utilisé comme nom de fichier .js à l'export).
     /// </summary>
@@ -98,7 +100,7 @@ public sealed record CrmRecord
     /// Utilisé lors de l'import pour tracer la date de modification.
     /// </summary>
     public CrmRecord WithUpdatedDmod() => this with { Dmod = DateTime.UtcNow };
-
+    
     /// <summary>
     /// Mappe une ligne du SqlDataReader vers un CrmRecord.
     /// Utilise Convert.ToString pour gérer tous les types SQL sans lever d'InvalidCastException
@@ -110,58 +112,27 @@ public sealed record CrmRecord
     public static CrmRecord FromReader(SqlDataReader reader) => new()
     {
         // Nrid est obligatoire , valeur par défaut string.Empty si null inattendu
-        Nrid = Convert.ToString(reader.GetValue(reader.GetOrdinal("nrid"))) ?? string.Empty,
+        Nrid   = Convert.ToString(reader.GetValue(reader.GetOrdinal("nrid"))) ?? string.Empty,
 
         // Colonnes identifiants peuvent être null en BD
-        Rid = reader.IsDBNull(reader.GetOrdinal("rid"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("rid"))),
-        Rmod = reader.IsDBNull(reader.GetOrdinal("rmod"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("rmod"))),
-        LangId = reader.IsDBNull(reader.GetOrdinal("lang_id"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("lang_id"))),
-        TierId = reader.IsDBNull(reader.GetOrdinal("tier_id"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("tier_id"))),
-        
+        Rid    = reader.IsDBNull(reader.GetOrdinal("rid"))     ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("rid"))),
+        Rmod   = reader.IsDBNull(reader.GetOrdinal("rmod"))    ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("rmod"))),
+        LangId = reader.IsDBNull(reader.GetOrdinal("lang_id")) ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("lang_id"))),
+        TierId = reader.IsDBNull(reader.GetOrdinal("tier_id")) ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("tier_id"))),
         Dmod = reader.IsDBNull(reader.GetOrdinal("dmod"))
-            ? (DateTime?)null
+            ? null
             : Convert.ToDateTime(reader.GetValue(reader.GetOrdinal("dmod"))),
+        
         // Colonnes textuelles
-        FunctionName = reader.IsDBNull(reader.GetOrdinal("function_name"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("function_name"))),
-        FunctionText = reader.IsDBNull(reader.GetOrdinal("function_text"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("function_text"))),
-        Title = reader.IsDBNull(reader.GetOrdinal("title"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("title"))),
-        Description = reader.IsDBNull(reader.GetOrdinal("description"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("description"))),
-        ShortcutDescription = reader.IsDBNull(reader.GetOrdinal("shortcut_description"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("shortcut_description"))),
-        ReturnDesc = reader.IsDBNull(reader.GetOrdinal("returndesc"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("returndesc"))),
-        Template = reader.IsDBNull(reader.GetOrdinal("template"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("template"))),
-        Type = reader.IsDBNull(reader.GetOrdinal("type"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("type"))),
-        BrowsersCompatibility = reader.IsDBNull(reader.GetOrdinal("browsers_compatibility"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("browsers_compatibility"))),
-        Img = reader.IsDBNull(reader.GetOrdinal("img"))
-            ? null
-            : Convert.ToString(reader.GetValue(reader.GetOrdinal("img"))),
-     
-
+        FunctionName          = reader.IsDBNull(reader.GetOrdinal("function_name"))          ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("function_name"))),
+        FunctionText          = reader.IsDBNull(reader.GetOrdinal("function_text"))          ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("function_text"))),
+        Title                 = reader.IsDBNull(reader.GetOrdinal("title"))                  ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("title"))),
+        Description           = reader.IsDBNull(reader.GetOrdinal("description"))            ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("description"))),
+        ShortcutDescription   = reader.IsDBNull(reader.GetOrdinal("shortcut_description"))   ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("shortcut_description"))),
+        ReturnDesc            = reader.IsDBNull(reader.GetOrdinal("returndesc"))             ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("returndesc"))),
+        Template              = reader.IsDBNull(reader.GetOrdinal("template"))               ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("template"))),
+        Type                  = reader.IsDBNull(reader.GetOrdinal("type"))                   ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("type"))),
+        BrowsersCompatibility = reader.IsDBNull(reader.GetOrdinal("browsers_compatibility")) ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("browsers_compatibility"))),
+        Img                   = reader.IsDBNull(reader.GetOrdinal("img"))                    ? null : Convert.ToString(reader.GetValue(reader.GetOrdinal("img"))),
     };
-    
 }

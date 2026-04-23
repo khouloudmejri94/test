@@ -1,5 +1,5 @@
-﻿using CrmDataExporter.Models;
-using CrmDataExporter.Services;
+﻿using CrmDataExporter.Core.Models;
+using CrmDataExporter.Core.Services;
 
 namespace CrmDataExporter.Commands;
 

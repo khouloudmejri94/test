@@ -1,7 +1,5 @@
 function AA_Test()
 {
-	
-	
 	var strQuery : String = "";
 	strQuery += " select top 1 so0.societe, xsalon_exposants.so0_nrid, cosa0.date_deb, so0.titulaire, so0.xcp, cosa0.ref ";
 	strQuery += " from sysadm.so0, sysadm.xsalon_exposants, sysadm.cosa0";

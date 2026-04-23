@@ -4530,7 +4530,7 @@
   {
     "Nrid": "30838270617990",
     "Rid": "SCRMAS2013-05-02-13.19.37.800491",
-    "Dmod": "2026-04-22T09:44:40.657",
+    "Dmod": "2026-04-23T08:39:38.633",
     "Rmod": "SCRMAS2013-05-02-13.25.39.683755",
     "FunctionName": "aa__Apl__Test",
     "Title": null,
@@ -11230,6 +11230,22 @@
     "BrowsersCompatibility": null,
     "LangId": "0",
     "TierId": "1"
+  },
+  {
+    "Nrid": "43641356636634",
+    "Rid": "SCRHIC2026-04-23-07.55.21.480059",
+    "Dmod": "2026-04-23T08:37:56.117",
+    "Rmod": "SCRHIC2026-04-23-08.37.56.117291",
+    "FunctionName": "WS_Send_New_Submission_Notifications",
+    "Title": null,
+    "Description": "Send New WeCom Submission Notifications to the owner of the company if it\u0027s Matched",
+    "ShortcutDescription": "Send New Submission Notifications",
+    "ReturnDesc": "",
+    "Template": null,
+    "Type": "0",
+    "BrowsersCompatibility": null,
+    "LangId": "1",
+    "TierId": "2"
   },
   {
     "Nrid": "43720557550138",

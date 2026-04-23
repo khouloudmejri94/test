@@ -1,7 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using CrmDataExporter.Core.Models;
 using CrmDataExporter.Models;
+using Microsoft.Data.SqlClient;
 
-namespace CrmDataExporter.Services;
+namespace CrmDataExporter.Core.Services;
 
 /// <summary>
 /// Utilitaires partagés entre les commandes Export et Import.

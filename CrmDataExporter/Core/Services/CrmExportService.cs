@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
+using CrmDataExporter.Core.Models;
 using CrmDataExporter.Models;
 
-namespace CrmDataExporter.Services;
+namespace CrmDataExporter.Core.Services;
 
 /// <summary>
 /// Service responsable de l'export des enregistrements CRM vers des fichiers js.

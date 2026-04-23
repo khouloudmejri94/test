@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using CrmDataExporter.Core.Models;
 using CrmDataExporter.Models;
 using Microsoft.Data.SqlClient;
 
