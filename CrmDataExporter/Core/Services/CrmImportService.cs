@@ -58,37 +58,34 @@ public sealed class CrmImportService
             {
                 bool exists = await RecordExistsAsync(connection, transaction, safeTableName, record.Nrid);
 
-                if (exists)
-                {
-                    // Récupère le function_text actuel depuis la base
-                    string? currentFunctionText = await GetFunctionTextAsync(
-                        connection, transaction, safeTableName, record.Nrid);
+                if (!exists)
+                    continue; 
 
-                    // Compare l'ancien et le nouveau function_text
-                    bool functionTextChanged = !string.Equals(
-                        currentFunctionText,
-                        record.FunctionText,
-                        StringComparison.Ordinal);
+                string? currentFunctionText = await GetFunctionTextAsync(
+                    connection, transaction, safeTableName, record.Nrid);
 
-                    // Dmod = maintenant si modifié, sinon on garde l'ancienne valeur
-                    DateTime? newDmod = functionTextChanged ? DateTime.UtcNow : record.Dmod;
+                bool functionTextChanged = !string.Equals(
+                    currentFunctionText?.Trim(),
+                    record.FunctionText?.Trim(),
+                    StringComparison.Ordinal);
 
-                    await UpdateRecordAsync(connection, transaction, safeTableName, newDmod ?? DateTime.UtcNow, record);
-                    updated++;
-
-                    if (functionTextChanged)
-                        Console.WriteLine($"  [UPDATE] ✓ Modifié  : {record.FunctionName ?? "-"} | dmod={newDmod:yyyy-MM-dd HH:mm:ss}");
-                    else
-                        Console.WriteLine($"  [UPDATE] = Inchangé : {record.FunctionName ?? "-"}");
-                }
+                if (!functionTextChanged)
+                    continue;
                 
-                else
-                {
-                    await InsertRecordAsync(connection, transaction, safeTableName, record);
-                    inserted++;
-                    Console.WriteLine($"  [INSERT] {record.FunctionName ?? "-"}");
-                }
+                DateTime newDmod = DateTime.UtcNow;
+
+                await UpdateRecordAsync(
+                    connection,
+                    transaction,
+                    safeTableName,
+                    newDmod,
+                    record);
+
+                updated++;
+
+                Console.WriteLine($"[UPDATE] ✓ Modifié : {record.FunctionName ?? "-"} | dmod={newDmod:yyyy-MM-dd HH:mm:ss}");
             }
+
             // Valide toutes les opérations si aucune erreur
             await transaction.CommitAsync();
             Console.WriteLine("Transaction validée (COMMIT).");
