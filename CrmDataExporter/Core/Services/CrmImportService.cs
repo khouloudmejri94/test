@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 namespace CrmDataExporter.Core.Services;
 
 /// <summary>
-/// Service responsable de l'import des enregistrements CRM depuis le système de fichiers exporter vers la BD.
+/// Service permet d'import des enregistrements CRM depuis le système de fichiers exporter vers la BD.
 /// Lit le (fichier JSON) + (les fichiers .js), puis applique les changements en base via une transaction.
 /// </summary>
 public sealed class CrmImportService
@@ -17,7 +17,6 @@ public sealed class CrmImportService
     /// Toutes les opérations sont encapsulées dans une transaction — rollback automatique en cas d'erreur.
     /// </summary>
     /// <param name="exportsDirectory">Dossier contenant les fichiers exportés.</param>
-    /// <param name="version">Version à importer (ex: v1.0.2).</param>
     /// <param name="connectionString">Chaîne de connexion SQL Server.</param>
     /// <param name="safeTableName">Nom de table sécurisé (ex: [sysadm].[scr0]).</param>
     /// <returns>Résultat de l'import : nombre d'insertions, mises à jour et total.</returns>
@@ -26,23 +25,24 @@ public sealed class CrmImportService
         string connectionString,
         string safeTableName)
     {
-        // 1. Lire le fichier JSON 
-        string jsonPath = Path.Combine(exportsDirectory, "crm-data.json");
-        if (!File.Exists(jsonPath))
-            throw new FileNotFoundException($"Fichier introuvable : {jsonPath}");
+        // Résoudre les chemins d'export (via manifest si disponible)
+        var (dataFilePath, functionsDir) = await ResolveExportPathsAsync(exportsDirectory);
 
-        string jsonContent = await File.ReadAllTextAsync(jsonPath);
-        List<CrmRecord> records = DeserializeRecords(jsonContent);
+        // Charger le JSON si présent (peut être filtré via last-import-date)
+        List<CrmRecord> records = [];
+        if (File.Exists(dataFilePath))
+        {
+            string jsonContent = await File.ReadAllTextAsync(dataFilePath);
+            records = DeserializeRecords(jsonContent);
+        }
 
-        // ── 2. Réintégrer function_text depuis les fichiers .js 
-        // Le JSON global ne contient pas function_text (exclu à l'export pour alléger).
-        // On le relit depuis le dossier .functions et on le réinjecte dans chaque record.
-        string functionsDir = Path.Combine(exportsDirectory, "crm-data.functions");
-        records = await MergeFunctionTextsAsync(records, functionsDir);
+        // Charger les fichiers .js et réinjecter les function_text sur les records du JSON.
+        var functionTexts = await LoadFunctionTextsAsync(functionsDir);
+        records = MergeFunctionTexts(records, functionTexts);
 
-        // ── 3. Appliquer en base avec transaction
+        // Appliquer en base avec transaction
         int inserted = 0;
-        int updated  = 0;
+        int updated = 0;
 
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync();
@@ -53,8 +53,12 @@ public sealed class CrmImportService
 
         try
         {
+            // Import des records provenant du JSON (upsert par nrid).
             foreach (CrmRecord record in records)
             {
+                if (string.IsNullOrWhiteSpace(record.Nrid))
+                    throw new InvalidDataException("Un record importé ne contient pas de 'Nrid' (champ requis).");
+
                 bool exists = await RecordExistsAsync(connection, transaction, safeTableName, record.Nrid);
 
                 if (!exists)
@@ -62,7 +66,7 @@ public sealed class CrmImportService
                     await InsertRecordAsync(connection, transaction, safeTableName, record);
                     inserted++;
                     Console.WriteLine($"[INSERT] + Ajouté : {record.FunctionName ?? "-"}");
-                    continue; 
+                    continue;
                 }
 
                 string? currentFunctionText = await GetFunctionTextAsync(
@@ -75,19 +79,52 @@ public sealed class CrmImportService
 
                 if (!functionTextChanged)
                     continue;
-                
+
                 DateTime newDmod = DateTime.UtcNow;
 
-                await UpdateRecordAsync(
-                    connection,
-                    transaction,
-                    safeTableName,
-                    newDmod,
-                    record);
+                // Quand on importe un record "complet" depuis le JSON, on applique toutes les colonnes.
+                // Cela évite des incohérences entre le fichier exporté et la base.
+                await UpdateRecordAsync(connection, transaction, safeTableName, newDmod, record);
 
                 updated++;
 
-                Console.WriteLine($"[UPDATE] ✓ Modifié : {record.FunctionName ?? "-"} | dmod={newDmod:yyyy-MM-dd HH:mm:ss}");
+                Console.WriteLine(
+                    $"[UPDATE] ✓ Modifié : {record.FunctionName ?? "-"} | dmod={newDmod:yyyy-MM-dd HH:mm:ss}");
+            }
+
+            // Import "functions-only": pour les .js qui ne sont pas présents dans le JSON
+             // On met à jour uniquement function_text + dmod en recherchant la ligne via function_name.
+            var knownFunctionNames = new HashSet<string>(
+                records.Select(r => r.FunctionName).Where(n => !string.IsNullOrWhiteSpace(n))!,
+                StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (functionName, newText) in functionTexts)
+            {
+                if (knownFunctionNames.Contains(functionName))
+                    continue;
+
+                var row = await GetRowByFunctionNameAsync(connection, transaction, safeTableName, functionName);
+                if (row == null)
+                {
+                    Console.WriteLine(
+                        $"[WARN] Aucune ligne trouvée pour function_name='{functionName}' (script ignoré).");
+                    continue;
+                }
+
+                bool changed = !string.Equals(
+                    row.Value.CurrentFunctionText?.Trim(),
+                    newText?.Trim(),
+                    StringComparison.Ordinal);
+
+                if (!changed)
+                    continue;
+
+                DateTime newDmod = DateTime.UtcNow;
+                await UpdateFunctionTextOnlyAsync(connection, transaction, safeTableName, row.Value.Nrid, newDmod,
+                    newText);
+                updated++;
+                Console.WriteLine(
+                    $"[UPDATE] ✓ Modifié (functions-only) : {functionName} | dmod={newDmod:yyyy-MM-dd HH:mm:ss}");
             }
 
             // Valide toutes les opérations si aucune erreur
@@ -105,11 +142,40 @@ public sealed class CrmImportService
         return new ImportResult
         {
             Inserted = inserted,
-            Updated  = updated,
-            Total    = inserted + updated
+            Updated = updated,
+            Total = inserted + updated
         };
     }
-    
+
+    private static async Task<(string dataFilePath, string functionsDir)> ResolveExportPathsAsync(
+        string exportsDirectory)
+    {
+        string defaultData = Path.Combine(exportsDirectory, "crm-data.json");
+        string defaultFunctions = Path.Combine(exportsDirectory, "crm-data.functions");
+
+        string manifestPath = Path.Combine(exportsDirectory, "crm-data-manifest.json");
+        if (!File.Exists(manifestPath))
+            return (defaultData, defaultFunctions);
+
+        try
+        {
+            string json = await File.ReadAllTextAsync(manifestPath);
+            using var doc = JsonDocument.Parse(json);
+            string? dataFile = doc.RootElement.TryGetProperty("DataFile", out var df) ? df.GetString() : null;
+            string? functionsDirectory =
+                doc.RootElement.TryGetProperty("FunctionsDirectory", out var fd) ? fd.GetString() : null;
+
+            return (
+                string.IsNullOrWhiteSpace(dataFile) ? defaultData : dataFile,
+                string.IsNullOrWhiteSpace(functionsDirectory) ? defaultFunctions : functionsDirectory
+            );
+        }
+        catch
+        {
+            return (defaultData, defaultFunctions);
+        }
+    }
+
     /// <summary>
     /// Récupère le contenu du champ function_text depuis la base de données
     /// pour un enregistrement identifié par son nrid.
@@ -140,12 +206,11 @@ public sealed class CrmImportService
 
         return result.ToString();
     }
-    
+
     /// <summary>
     /// Désérialise le contenu JSON en liste de CrmRecord.
     /// La désérialisation est insensible à la casse des noms de propriétés.
     /// </summary>
-    
     private static List<CrmRecord> DeserializeRecords(string jsonContent)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -153,38 +218,40 @@ public sealed class CrmImportService
                ?? throw new InvalidDataException("JSON invalide ou vide.");
     }
 
-    /// <summary>
-    /// Relit les fichiers .js du dossier .functions et réinjecte leur contenu
-    /// dans la propriété FunctionText de chaque CrmRecord correspondant.
-    /// Si le dossier n'existe pas, retourne les records inchangés.
-    /// </summary>
-    private static async Task<List<CrmRecord>> MergeFunctionTextsAsync(
-        List<CrmRecord> records,
-        string functionsDir)
+    private static async Task<Dictionary<string, string?>> LoadFunctionTextsAsync(string functionsDir)
     {
+        var functionTexts = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+
         if (!Directory.Exists(functionsDir))
         {
-            Console.WriteLine($"  [WARN] Dossier de fonctions introuvable : {functionsDir}");
-            return records;
+            Console.WriteLine($" Dossier de fonctions introuvable : {functionsDir}");
+            return functionTexts;
         }
 
-        var functionTexts = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (string jsFile in Directory.GetFiles(functionsDir, "*.js"))
         {
             string funcName = Path.GetFileNameWithoutExtension(jsFile);
             functionTexts[funcName] = await File.ReadAllTextAsync(jsFile);
         }
 
+        return functionTexts;
+    }
+
+    private static List<CrmRecord> MergeFunctionTexts(List<CrmRecord> records,
+        Dictionary<string, string?> functionTexts)
+    {
+        if (records.Count == 0 || functionTexts.Count == 0)
+            return records;
+
         return records.Select(r =>
         {
-            if (r.FunctionName != null && functionTexts.TryGetValue(r.FunctionName, out string? text))
-            {
+            if (!string.IsNullOrWhiteSpace(r.FunctionName) && functionTexts.TryGetValue(r.FunctionName, out var text))
                 return r with { FunctionText = text };
-            }
 
             return r;
         }).ToList();
     }
+
     /// <summary>
     /// Vérifie si un enregistrement existe déjà en base en recherchant par nrid.
     /// </summary>
@@ -199,6 +266,55 @@ public sealed class CrmImportService
         cmd.Parameters.AddWithValue("@nrid", nrid);
         int count = (int)(await cmd.ExecuteScalarAsync() ?? 0);
         return count > 0;
+    }
+
+    private readonly record struct FunctionRow(string Nrid, string? CurrentFunctionText);
+
+    private static async Task<FunctionRow?> GetRowByFunctionNameAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        string tableName,
+        string functionName)
+    {
+        string sql = $"SELECT TOP 1 nrid, function_text FROM {tableName} WHERE function_name = @function_name";
+
+        await using var cmd = new SqlCommand(sql, connection, transaction);
+        cmd.Parameters.AddWithValue("@function_name", functionName);
+
+        await using var reader = await cmd.ExecuteReaderAsync();
+        if (!await reader.ReadAsync())
+            return null;
+
+        string nrid = Convert.ToString(reader.GetValue(reader.GetOrdinal("nrid"))) ?? string.Empty;
+        string? functionText = reader.IsDBNull(reader.GetOrdinal("function_text"))
+            ? null
+            : reader.GetValue(reader.GetOrdinal("function_text")).ToString();
+
+        if (string.IsNullOrWhiteSpace(nrid))
+            return null;
+
+        return new FunctionRow(nrid, functionText);
+    }
+
+    private static async Task UpdateFunctionTextOnlyAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        string tableName,
+        string nrid,
+        DateTime dmod,
+        string? functionText)
+    {
+        string sql = $@"
+UPDATE {tableName}
+SET function_text = @function_text,
+    dmod          = @dmod
+WHERE nrid = @nrid";
+
+        await using var cmd = new SqlCommand(sql, connection, transaction);
+        cmd.Parameters.AddWithValue("@nrid", nrid);
+        cmd.Parameters.AddWithValue("@dmod", dmod);
+        cmd.Parameters.AddWithValue("@function_text", (object?)functionText ?? DBNull.Value);
+        await cmd.ExecuteNonQueryAsync();
     }
 
     /// <summary>
@@ -273,21 +389,21 @@ public sealed class CrmImportService
     /// </summary>
     private static void AddParameters(SqlCommand cmd, CrmRecord r)
     {
-        cmd.Parameters.AddWithValue("@nrid",                   r.Nrid);
-        cmd.Parameters.AddWithValue("@rid",                    (object?)r.Rid                   ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@dmod",                   (object?)r.Dmod                  ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@rmod",                   (object?)r.Rmod                  ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@function_name",          (object?)r.FunctionName          ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@function_text",          (object?)r.FunctionText          ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@title",                  (object?)r.Title                 ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@description",            (object?)r.Description           ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@shortcut_description",   (object?)r.ShortcutDescription   ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@returndesc",             (object?)r.ReturnDesc            ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@template",               (object?)r.Template              ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@type",                   (object?)r.Type                  ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@nrid", r.Nrid);
+        cmd.Parameters.AddWithValue("@rid", (object?)r.Rid ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@dmod", (object?)r.Dmod ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@rmod", (object?)r.Rmod ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@function_name", (object?)r.FunctionName ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@function_text", (object?)r.FunctionText ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@title", (object?)r.Title ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@description", (object?)r.Description ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@shortcut_description", (object?)r.ShortcutDescription ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@returndesc", (object?)r.ReturnDesc ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@template", (object?)r.Template ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@type", (object?)r.Type ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@browsers_compatibility", (object?)r.BrowsersCompatibility ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@lang_id",                (object?)r.LangId                ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@tier_id",                (object?)r.TierId                ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@img",                    (object?)r.Img                   ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@lang_id", (object?)r.LangId ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@tier_id", (object?)r.TierId ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@img", (object?)r.Img ?? DBNull.Value);
     }
 }

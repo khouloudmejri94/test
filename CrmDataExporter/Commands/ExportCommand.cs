@@ -44,7 +44,6 @@ public static class ExportCommand
         // Affichage des infos après export
         Console.WriteLine($"Export terminé.");
         Console.WriteLine($"  Data       : {manifest.DataFile}");
-        Console.WriteLine($"  Checksum   : {manifest.ChecksumSha256}");
         Console.WriteLine($"  Nb records : {manifest.RecordCount}");
     }
 

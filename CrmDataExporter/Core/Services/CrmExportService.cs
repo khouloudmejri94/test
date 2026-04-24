@@ -1,19 +1,19 @@
 using System.Text.Json;
 using CrmDataExporter.Core.Models;
-using CrmDataExporter.Models;
+
 
 namespace CrmDataExporter.Core.Services;
 
 /// <summary>
 /// Service responsable de l'export des enregistrements CRM vers des fichiers js.
-/// Produit deux artefacts : un fichier JSON global et un dossier de fichiers JS séparés.
+/// Produit : un fichier JSON global et un dossier de fichiers JS séparés.
 /// </summary>
 public sealed class CrmExportService
 {
     /// <summary>
     /// Exporte la liste des enregistrements CRM en deux formats :
-    /// 1. Un fichier JSON sans les function_text (données légères)
-    /// 2. Un dossier chaque function dans un fichier .js par enregistrement
+    /// Un fichier JSON sans les function_text (données légères)
+    /// Un dossier chaque function dans un fichier .js par enregistrement
     /// Retourne un manifest contenant les métadonnées de l'export.
     /// </summary>
     /// <param name="records">Liste des enregistrements lus depuis la BD.</param>
@@ -60,30 +60,23 @@ public sealed class CrmExportService
             await File.WriteAllTextAsync(Path.Combine(functionsDir, fileName), record.FunctionText!);
         }
 
-        // ── 3. Calcul du checksum SHA-256
-        // Le checksum est calculé sur le contenu JSON pour détecter toute altération
-        string checksum = Convert.ToHexString(
-            System.Security.Cryptography.SHA256.HashData(
-                System.Text.Encoding.UTF8.GetBytes(jsonContent)));
         string manifestPath = Path.Combine(outputDirectory, $"crm-data-manifest.json");
-
         string manifestContent = JsonSerializer.Serialize(
             new ExportManifest
             {
                 CreatedAtUtc = DateTime.UtcNow,
                 DataFile = jsonPath,
-                ChecksumSha256 = checksum,
+                FunctionsDirectory = functionsDir, 
                 RecordCount = records.Count,
             },
             new JsonSerializerOptions { WriteIndented = true });
 
         await File.WriteAllTextAsync(manifestPath, manifestContent);
-        // ── 4. Retourne le manifest de l'export 
+        // 4. Retourne le manifest de l'export 
         return new ExportManifest
         {
             CreatedAtUtc = DateTime.UtcNow,
             DataFile = jsonPath,
-            ChecksumSha256 = checksum,
             RecordCount = records.Count
         };
     }

@@ -1,5 +1,4 @@
 using CrmDataExporter.Core.Models;
-using CrmDataExporter.Models;
 using Microsoft.Data.SqlClient;
 
 namespace CrmDataExporter.Core.Services;
