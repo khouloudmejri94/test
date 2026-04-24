@@ -1,4 +1,4 @@
-﻿using CrmDataExporter.Commands;
+using CrmDataExporter.Commands;
 
 string outputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "exports");
 string? connectionString = Environment.GetEnvironmentVariable("CRM_EXPORT_CONNECTION_STRING");
