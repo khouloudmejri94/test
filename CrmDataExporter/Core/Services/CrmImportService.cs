@@ -23,12 +23,11 @@ public sealed class CrmImportService
     /// <returns>Résultat de l'import : nombre d'insertions, mises à jour et total.</returns>
     public async Task<ImportResult> ImportAsync(
         string exportsDirectory,
-        string version,
         string connectionString,
         string safeTableName)
     {
         // 1. Lire le fichier JSON 
-        string jsonPath = Path.Combine(exportsDirectory, $"crm-data-{version}.json");
+        string jsonPath = Path.Combine(exportsDirectory, "crm-data.json");
         if (!File.Exists(jsonPath))
             throw new FileNotFoundException($"Fichier introuvable : {jsonPath}");
 
@@ -38,7 +37,7 @@ public sealed class CrmImportService
         // ── 2. Réintégrer function_text depuis les fichiers .js 
         // Le JSON global ne contient pas function_text (exclu à l'export pour alléger).
         // On le relit depuis le dossier .functions et on le réinjecte dans chaque record.
-        string functionsDir = Path.Combine(exportsDirectory, $"crm-data-{version}.functions");
+        string functionsDir = Path.Combine(exportsDirectory, "crm-data.functions");
         records = await MergeFunctionTextsAsync(records, functionsDir);
 
         // ── 3. Appliquer en base avec transaction
@@ -105,7 +104,6 @@ public sealed class CrmImportService
 
         return new ImportResult
         {
-            Version  = version,
             Inserted = inserted,
             Updated  = updated,
             Total    = inserted + updated

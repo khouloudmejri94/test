@@ -18,12 +18,9 @@ public sealed class CrmExportService
     /// </summary>
     /// <param name="records">Liste des enregistrements lus depuis la BD.</param>
     /// <param name="outputDirectory">Dossier de destination des fichiers exportés.</param>
-    /// <param name="version">Version de l'export (ex: v1.0.2).</param>
-    /// <returns>Manifest contenant version, checksum, chemin et nombre d'enregistrements.</returns>
     public async Task<ExportManifest?> ExportAsync(
         List<CrmRecord> records,
-        string outputDirectory,
-        string version)
+        string outputDirectory)
     {
         if (records.Count == 0)
         {
@@ -45,16 +42,15 @@ public sealed class CrmExportService
             r.LangId, r.TierId
         }).ToList();
 
-        string jsonPath = Path.Combine(outputDirectory, $"crm-data-{version}.json");
+        string jsonPath = Path.Combine(outputDirectory, $"crm-data.json");
 
         // Sérialise avec indentation pour lisibilité humaine
         string jsonContent = JsonSerializer.Serialize(sanitized, new JsonSerializerOptions { WriteIndented = true });
         await File.WriteAllTextAsync(jsonPath, jsonContent);
 
         // 2. Export (fichiers .js) séparés
-        // Crée un dossier crm-data-{version}.functions
         // Chaque enregistrement ayant un function_text devient un fichier .js individuel
-        string functionsDir = Path.Combine(outputDirectory, $"crm-data-{version}.functions");
+        string functionsDir = Path.Combine(outputDirectory, $"crm-data.functions");
         Directory.CreateDirectory(functionsDir);
 
         foreach (CrmRecord record in records.Where(r => !string.IsNullOrWhiteSpace(r.FunctionText)))
@@ -69,16 +65,15 @@ public sealed class CrmExportService
         string checksum = Convert.ToHexString(
             System.Security.Cryptography.SHA256.HashData(
                 System.Text.Encoding.UTF8.GetBytes(jsonContent)));
-        string manifestPath = Path.Combine(outputDirectory, $"crm-data-manifest-{version}.json");
+        string manifestPath = Path.Combine(outputDirectory, $"crm-data-manifest.json");
 
         string manifestContent = JsonSerializer.Serialize(
             new ExportManifest
             {
-                Version = version,
                 CreatedAtUtc = DateTime.UtcNow,
                 DataFile = jsonPath,
                 ChecksumSha256 = checksum,
-                RecordCount = records.Count
+                RecordCount = records.Count,
             },
             new JsonSerializerOptions { WriteIndented = true });
 
@@ -86,7 +81,6 @@ public sealed class CrmExportService
         // ── 4. Retourne le manifest de l'export 
         return new ExportManifest
         {
-            Version = version,
             CreatedAtUtc = DateTime.UtcNow,
             DataFile = jsonPath,
             ChecksumSha256 = checksum,

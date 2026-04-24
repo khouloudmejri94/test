@@ -9,10 +9,10 @@ public static class ExportCommand
     /// <summary>
     /// lancer l’export des données CRM
     /// </summary>
-    public static async Task RunAsync(string version, string tableName, string outputDirectory, string connectionString)
+    public static async Task RunAsync(string tableName, string outputDirectory, string connectionString)
     {
         // Affiche le début de l'export
-        Console.WriteLine($"Export en cours : {tableName} → {version}");
+        Console.WriteLine($"Export en cours : {tableName}");
 
         // Récupère la date du dernier import (si existe)
         DateTime? lastImportDate = GetLastImportDate(outputDirectory);
@@ -32,7 +32,7 @@ public static class ExportCommand
         var exporter = new CrmExportService();
 
         // Exporte les données et génère un manifest (fichier de métadonnées)
-        var manifest = await exporter.ExportAsync(records, outputDirectory, version);
+        var manifest = await exporter.ExportAsync(records, outputDirectory);
 
         // Si aucun changement: pas d’export
         if (manifest == null)
@@ -43,7 +43,6 @@ public static class ExportCommand
 
         // Affichage des infos après export
         Console.WriteLine($"Export terminé.");
-        Console.WriteLine($"  Version    : {manifest.Version}");
         Console.WriteLine($"  Data       : {manifest.DataFile}");
         Console.WriteLine($"  Checksum   : {manifest.ChecksumSha256}");
         Console.WriteLine($"  Nb records : {manifest.RecordCount}");
@@ -54,33 +53,25 @@ public static class ExportCommand
     /// </summary>
     private static DateTime? GetLastImportDate(string outputDirectory)
     {
-        // Si le dossier n’existe pas → aucun import
+        // Aucun import si le dossier n'existe pas 
         if (!Directory.Exists(outputDirectory)) return null;
 
-        // Récupère tous les fichiers manifest d’import
-        var importManifests = Directory.GetFiles(outputDirectory, "crm-import-manifest-*.json");
+        string manifestPath = Path.Combine(outputDirectory, "crm-import-manifest.json");
+        if (!File.Exists(manifestPath)) return null;
 
-        DateTime? maxDate = null;
-
-        // Parcour chaque fichier manifest
-        foreach (var file in importManifests)
+        try
         {
-            try
+            string json = File.ReadAllText(manifestPath);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty("ImportedAtUtc", out var prop) && prop.TryGetDateTime(out var date))
             {
-                string json = File.ReadAllText(file);
-                using var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("ImportedAtUtc", out var prop) && prop.TryGetDateTime(out var date))
-                {
-                    // Garde la date la plus récente
-                    if (maxDate == null || date > maxDate)
-                        maxDate = date;
-                }
-            }
-            catch
-            {
-                // Ignore les erreurs
+                return date;
             }
         }
-        return maxDate;
+        catch
+        {
+            // Ignore les erreurs
+        }
+        return null;
     }
 }
