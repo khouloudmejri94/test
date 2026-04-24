@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using CrmDataExporter.Core.Models;
 using CrmDataExporter.Models;
 
@@ -20,11 +20,16 @@ public sealed class CrmExportService
     /// <param name="outputDirectory">Dossier de destination des fichiers exportés.</param>
     /// <param name="version">Version de l'export (ex: v1.0.2).</param>
     /// <returns>Manifest contenant version, checksum, chemin et nombre d'enregistrements.</returns>
-    public async Task<ExportManifest> ExportAsync(
+    public async Task<ExportManifest?> ExportAsync(
         List<CrmRecord> records,
         string outputDirectory,
         string version)
     {
+        if (records.Count == 0)
+        {
+            return null;
+        }
+
         // Crée le dossier de sortie s'il n'existe pas encore
         Directory.CreateDirectory(outputDirectory);
 

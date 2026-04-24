@@ -4,12 +4,9 @@ namespace CrmDataExporter.Core.Models;
 
 /// <summary>
 /// Représente un enregistrement de la table scr0 du CRM.
-/// Modélise fidèlement la structure de la BD : toutes les colonnes sont nullable
-/// sauf Nrid qui est l'identifiant unique de chaque enregistrement.
 /// Déclaré en "record" pour bénéficier de l'expression "with" (copie non-destructive)
 /// utilisée dans CrmImportService pour réinjecter FunctionText sans modifier l'original.
 /// Déclaré "sealed" pour interdire l'héritage.
-/// Toutes les propriétés sont "init" : immuables après construction.
 /// </summary>
 public sealed record CrmRecord
 {
@@ -50,7 +47,6 @@ public sealed record CrmRecord
 
     /// <summary>
     /// Code du fonction JavaScript.
-    /// Exclu du fichier JSON global à l'export — stocké séparément dans le dossier .functions.
     /// Réinjecté lors de l'import via MergeFunctionTextsAsync.
     /// </summary>
     public string? FunctionText { get; init; }

@@ -27,7 +27,7 @@ public sealed class CrmImportService
         string connectionString,
         string safeTableName)
     {
-        // ── 1. Lire le fichier JSON 
+        // 1. Lire le fichier JSON 
         string jsonPath = Path.Combine(exportsDirectory, $"crm-data-{version}.json");
         if (!File.Exists(jsonPath))
             throw new FileNotFoundException($"Fichier introuvable : {jsonPath}");
@@ -59,7 +59,12 @@ public sealed class CrmImportService
                 bool exists = await RecordExistsAsync(connection, transaction, safeTableName, record.Nrid);
 
                 if (!exists)
+                {
+                    await InsertRecordAsync(connection, transaction, safeTableName, record);
+                    inserted++;
+                    Console.WriteLine($"[INSERT] + Ajouté : {record.FunctionName ?? "-"}");
                     continue; 
+                }
 
                 string? currentFunctionText = await GetFunctionTextAsync(
                     connection, transaction, safeTableName, record.Nrid);

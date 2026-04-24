@@ -143,5 +143,6 @@ function AfterLoad_FP_1000001()
 	} catch (e) {
 	    alert("AfterLoad Header - Test Champs Planning : " + e.message);
 	}
-	// HAS DEB - 04/08/2023 - Figer les champs initialisés par le planning
+	// HAS DEB - 04/08/2023 - Figer les champs initialisés par le planning      
+	//test
 }

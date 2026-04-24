@@ -1,4 +1,4 @@
-﻿using CrmDataExporter.Core.Models;
+using CrmDataExporter.Core.Models;
 using CrmDataExporter.Models;
 using Microsoft.Data.SqlClient;
 
@@ -16,10 +16,14 @@ public static class SqlHelper
     /// <param name="connectionString">Chaîne de connexion SQL Server.</param>
     /// <param name="safeTableName">Nom de table déjà sécurisé (ex: [sysadm].[scr0]).</param>
     /// <returns>Liste des enregistrements mappés.</returns>
-    public static async Task<List<CrmRecord>> LoadRowsAsync(string connectionString, string safeTableName)
+    public static async Task<List<CrmRecord>> LoadRowsAsync(string connectionString, string safeTableName, DateTime? sinceDate = null)
     {
         var records = new List<CrmRecord>();
         var sql = $"SELECT * FROM {safeTableName}";
+        if (sinceDate.HasValue)
+        {
+            sql += " WHERE dmod > @sinceDate";
+        }
 
         // Ouvre la connexion SQL Server
         await using var connection = new SqlConnection(connectionString);
@@ -27,6 +31,10 @@ public static class SqlHelper
 
         // Exécute la requête avec un timeout de 120 secondes
         await using var command = new SqlCommand(sql, connection);
+        if (sinceDate.HasValue)
+        {
+            command.Parameters.AddWithValue("@sinceDate", sinceDate.Value);
+        }
         command.CommandTimeout = 120;
         await using var reader = await command.ExecuteReaderAsync();
 
