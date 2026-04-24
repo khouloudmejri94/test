@@ -258,6 +258,20 @@ function WS_Quo_MAJ_Statut(pQuoCustReference,pQuoExtStatOff,pQuoExtRefAR,pQuoExt
 	  }
 	  objQuotation.SetValues(mySelectionRow);
 	  objQuotation.Save();
+	
+	//Hich : 20/04/2026 : ouvrit la fiche taquet si l'offre est mise en stand by
+	
+	try{
+	    SS_App_UpdateStatus(pQuoCustReference, 0);
+	  }
+	  catch(e){
+	    Selligent.Library.Monitor.Tracer.Write("ERREUR MAJ STATUS FICHE TAQUET" + e.message, false);
+	  }
+	
+	//Hich : 20/04/2026 : ouvrit la fiche taquet si l'offre est mise en stand by
+	
+	
+	
 	 } else {
 	  if (MyRows.Count >= 1) {
 	   vRetour = "Erreur : Il existe plusieurs offres avec ce numéro !! ";

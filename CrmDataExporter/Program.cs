@@ -5,7 +5,6 @@ string? connectionString = Environment.GetEnvironmentVariable("CRM_EXPORT_CONNEC
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-    Console.Error.WriteLine("Variable manquante: CRM_EXPORT_CONNECTION_STRING");
     Console.Error.WriteLine(
         "setx CRM_EXPORT_CONNECTION_STRING \"Server=MONSERVEUR;Database=MaBase;Trusted_Connection=True;TrustServerCertificate=True;\"");
     return;

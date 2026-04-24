@@ -178,6 +178,8 @@ function SS_App_Call_Taquet(pOfferNb,pRequest,pNRID)
 	
 	        result = CallAPI("GET", url, null);
 	
+	        jonStr = url ; 
+	
 	        if (!result || result == "")
 	            throw new Error("KO|TAQUET IMPORT|Empty API response|Please check wheck with support team");
 	
@@ -335,7 +337,7 @@ function SS_App_Call_Taquet(pOfferNb,pRequest,pNRID)
 	                "'" + ligne["purchase_unit_price"] + "'" +
 	
 	                ")";
-	            Selligent.Library.Monitor.Tracer.Write("TAQUET QUOTE SQL : " + sql);
+	            //Selligent.Library.Monitor.Tracer.Write("TAQUET QUOTE SQL : " + sql);
 	            MyQryObj.ExecuteSql(sql);
 	        }
 	
@@ -348,6 +350,7 @@ function SS_App_Call_Taquet(pOfferNb,pRequest,pNRID)
 	
 	        //vMessage = "S Import OK : " + inserted + " lines inserted";
 	        vMessage = "S|TAQUET IMPORT|This file has been correcty imported.|" + inserted + " lines inserted";
+	        Selligent.Library.Monitor.Tracer.Write("TAQUET QUOTE vMessage : " + vMessage);
 	    }
 	
 	    vRetour = vMessage;
@@ -369,6 +372,8 @@ function SS_App_Call_Taquet(pOfferNb,pRequest,pNRID)
 	}
 	finally {
 	
+	    
+	
 	    var safeJson = jonStr ? jonStr.replace(/'/g, "''") : "";
 	    var safeResult = vRetour ? vRetour.replace(/'/g, "''") : "";
 	    var safeDebug = result ? result.replace(/'/g, "''") : "";
@@ -380,6 +385,8 @@ function SS_App_Call_Taquet(pOfferNb,pRequest,pNRID)
 	        "'" + safeResult.substring(0,200) + "'," +
 	        "'" + safeDebug.substring(0,1000) + "',GETDATE())"
 	    );
+	
+	    //Selligent.Library.Monitor.Tracer.Write("TAQUET QUOTE Finally : " + safeJson.substring(0,500) + " | " + safeResult.substring(0,200) + " | " + safeDebug.substring(0,1000));
 	
 	    if (MyQryObj) {
 	        MyQryObj.Dispose();

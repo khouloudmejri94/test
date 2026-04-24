@@ -1,4 +1,4 @@
-﻿namespace CrmDataExporter.Models;
+﻿namespace CrmDataExporter.Core.Models;
 
 
     public sealed class ExportManifest

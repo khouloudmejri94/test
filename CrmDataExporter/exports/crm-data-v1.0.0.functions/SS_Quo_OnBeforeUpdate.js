@@ -165,20 +165,6 @@ function SS_Quo_OnBeforeUpdate(QuoNRID)
 	    CurrentRecord["QuoExtDateValidMKTNormes"] = DateTime.Now.ToString("dd/MM/yyyy");
 	}
 	// HAS END 10/10/2019 : si Statut PACK "Non Validé" alors à la date du jour
-	
-	
-	
-	if (CurrentRecord.IsUpdated("QuoExtLabDateEstime") == true  &&  CurrentRecord.IsUpdated("QuoExtLabDateRec") == true &&  CurrentRecord["QuoExtLabDateEstime"] != null && CurrentRecord["QuoExtLabDateRec"] != null )
-	{
-	   var dateEstime = new Date(CurrentRecord["QuoExtLabDateEstime"]);
-	    var dateRec = new Date(CurrentRecord["QuoExtLabDateRec"]);
-	
-	    var diffMs = dateEstime - dateRec;
-	    var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-	
-	    CurrentRecord["QuoExtTrtPar"] = diffDays;
-	}
-	
 		// HAS : si Demande de passage commande alors récupérer l'heure
 	if (CurrentRecord.IsUpdated("QuoExtDateDemande") == true) {
 	    //CurrentRecord["QuoExtHeureDemande"] = DateTime.Now.ToString("HH:mm:ss");
@@ -827,79 +813,79 @@ function SS_Quo_OnBeforeUpdate(QuoNRID)
 	 }
 	}
 		try {
-		var nQuoNRID = CurrentRecord["QuoNRID"];
-		var objReq = CreateSelligentObject("SqlHelper", CurrentSessionID);
-		//INSERT INTO XDEROGATION
-		var vDateValDerog1 = CurrentRecord["QuoExtDateValDerog1"].ToString("dd/MM/yyyy hh:mm:ss");
-		var vDateValDerog2 = CurrentRecord["QuoExtDateValDerog2"].ToString("dd/MM/yyyy hh:mm:ss");
-		var vDateValDerog3 = CurrentRecord["QuoExtDateValDerog3"].ToString("dd/MM/yyyy hh:mm:ss");
-		var vDeviseDerogTq = CurrentRecord["QuoExtDeviseDerogTq"];
-		var vDetailDemDerog = CurrentRecord["QuoExtDetailDemDerog"];
-		var vStatDerog3 = CurrentRecord["QuoExtStatDerog3"];
-		var vUserValDerog2 = CurrentRecord["QuoExtUserValDerog2"];
-		var vDeviseDerogPi = CurrentRecord["QuoExtDeviseDerogPi"];
-		var vStatDerog1 = CurrentRecord["QuoExtStatDerog1"];
-		var vMntDerogPi = CurrentRecord["QuoExtMntDerogPi"];
-		var vMntDerogAnego = CurrentRecord["QuoExtMntDerogAnego"];
-		var vDetailValDerog1 = CurrentRecord["QuoExtDetailValDerog1"];
-		var vStatDerog2 = CurrentRecord["QuoExtStatDerog2"];
-		var vDetailValDerog3 = CurrentRecord["QuoExtDetailValDerog3"];
-		var vUserValDerog1 = CurrentRecord["QuoExtUserValDerog1"];
-		var vDetailValDerog2 = CurrentRecord["QuoExtDetailValDerog2"];
-		var vMntDerogMarge = CurrentRecord["QuoExtMntDerogMarge"];
-		var vTypeDerog = CurrentRecord["QuoExtTypeDerog"];
-		var vDeviseDepassDerog = CurrentRecord["QuoExtDeviseDepassDerog"];
-		var vDeviseDerogMarge = CurrentRecord["QuoExtDeviseDerogMarge"];
-		var vUserValDerog3 = CurrentRecord["QuoExtUserValDerog3"];
-		var vAppelDerog = CurrentRecord["QuoExtAppelDerog"];
-		var vMntDerogTq = CurrentRecord["QuoExtMntDerogTq"];
-		var vValDepassDerog = CurrentRecord["QuoExtValDepassDerog"];
-		var vMntDerogNego = CurrentRecord["QuoExtMntDerogNego"];
-		if (vDateValDerog2 == '' || vDateValDerog2 == null || vDateValDerog2 == undefined) {
-			vDateValDerog2 = '';
-		} else {
-			vDateValDerog2 = vDateValDerog2.ToString("dd/MM/yyyy hh:mm:ss");
-		}
-		if (vDateValDerog3 == '' || vDateValDerog3 == null || vDateValDerog3 == undefined) {
-			vDateValDerog3 = '';
-		} else {
-			vDateValDerog3 = vDateValDerog3.ToString("dd/MM/yyyy hh:mm:ss");
-		}
-		if (vDeviseDerogTq == null) vDeviseDerogTq = '';
-		if (vDetailDemDerog == null) vDetailDemDerog = '';
-		if (vStatDerog3 == null) vStatDerog3 = '';
-		if (vUserValDerog2 == null) vUserValDerog2 = '';
-		if (vDeviseDerogPi == null) vDeviseDerogPi = '';
-		if (vStatDerog1 == null) vStatDerog1 = '';
-		if (vMntDerogPi == null) vMntDerogPi = '';
-		if (vMntDerogAnego == null) vMntDerogAnego = '';
-		if (vDetailValDerog1 == null) vDetailValDerog1 = '';
-		if (vStatDerog2 == null) vStatDerog2 = '';
-		if (vDetailValDerog3 == null) vDetailValDerog3 = '';
-		if (vUserValDerog1 == null) vUserValDerog1 = '';
-		if (vDetailValDerog2 == null) vDetailValDerog2 = '';
-		if (vMntDerogMarge == null) vMntDerogMarge = '';
-		if (vTypeDerog == null) vTypeDerog = '';
-		if (vDeviseDepassDerog == null) vDeviseDepassDerog = '';
-		if (vDeviseDerogMarge == null) vDeviseDerogMarge = '';
-		if (vUserValDerog3 == null) vUserValDerog3 = '';
-		if (vAppelDerog == null) vAppelDerog = '';
-		if (vMntDerogTq == null) vMntDerogTq = '';
-		if (vValDepassDerog == null) vValDepassDerog = '';
-		if (vMntDerogNego == null) vMntDerogNego = '';
+	 var nQuoNRID = CurrentRecord["QuoNRID"];
+	 var objReq = CreateSelligentObject("SqlHelper", CurrentSessionID);
+	 //INSERT INTO XDEROGATION
+	 var vDateValDerog1 = CurrentRecord["QuoExtDateValDerog1"].ToString("dd/MM/yyyy hh:mm:ss");
+	 var vDateValDerog2 = CurrentRecord["QuoExtDateValDerog2"].ToString("dd/MM/yyyy hh:mm:ss");
+	 var vDateValDerog3 = CurrentRecord["QuoExtDateValDerog3"].ToString("dd/MM/yyyy hh:mm:ss");
+	 var vDeviseDerogTq = CurrentRecord["QuoExtDeviseDerogTq"];
+	 var vDetailDemDerog = CurrentRecord["QuoExtDetailDemDerog"];
+	 var vStatDerog3 = CurrentRecord["QuoExtStatDerog3"];
+	 var vUserValDerog2 = CurrentRecord["QuoExtUserValDerog2"];
+	 var vDeviseDerogPi = CurrentRecord["QuoExtDeviseDerogPi"];
+	 var vStatDerog1 = CurrentRecord["QuoExtStatDerog1"];
+	 var vMntDerogPi = CurrentRecord["QuoExtMntDerogPi"];
+	 var vMntDerogAnego = CurrentRecord["QuoExtMntDerogAnego"];
+	 var vDetailValDerog1 = CurrentRecord["QuoExtDetailValDerog1"];
+	 var vStatDerog2 = CurrentRecord["QuoExtStatDerog2"];
+	 var vDetailValDerog3 = CurrentRecord["QuoExtDetailValDerog3"];
+	 var vUserValDerog1 = CurrentRecord["QuoExtUserValDerog1"];
+	 var vDetailValDerog2 = CurrentRecord["QuoExtDetailValDerog2"];
+	 var vMntDerogMarge = CurrentRecord["QuoExtMntDerogMarge"];
+	 var vTypeDerog = CurrentRecord["QuoExtTypeDerog"];
+	 var vDeviseDepassDerog = CurrentRecord["QuoExtDeviseDepassDerog"];
+	 var vDeviseDerogMarge = CurrentRecord["QuoExtDeviseDerogMarge"];
+	 var vUserValDerog3 = CurrentRecord["QuoExtUserValDerog3"];
+	 var vAppelDerog = CurrentRecord["QuoExtAppelDerog"];
+	 var vMntDerogTq = CurrentRecord["QuoExtMntDerogTq"];
+	 var vValDepassDerog = CurrentRecord["QuoExtValDepassDerog"];
+	 var vMntDerogNego = CurrentRecord["QuoExtMntDerogNego"];
+	 if (vDateValDerog2 == '' || vDateValDerog2 == null || vDateValDerog2 == undefined) {
+	  vDateValDerog2 = '';
+	 } else {
+	  vDateValDerog2 = vDateValDerog2.ToString("dd/MM/yyyy hh:mm:ss");
+	 }
+	 if (vDateValDerog3 == '' || vDateValDerog3 == null || vDateValDerog3 == undefined) {
+	  vDateValDerog3 = '';
+	 } else {
+	  vDateValDerog3 = vDateValDerog3.ToString("dd/MM/yyyy hh:mm:ss");
+	 }
+	 if (vDeviseDerogTq == null) vDeviseDerogTq = '';
+	 if (vDetailDemDerog == null) vDetailDemDerog = '';
+	 if (vStatDerog3 == null) vStatDerog3 = '';
+	 if (vUserValDerog2 == null) vUserValDerog2 = '';
+	 if (vDeviseDerogPi == null) vDeviseDerogPi = '';
+	 if (vStatDerog1 == null) vStatDerog1 = '';
+	 if (vMntDerogPi == null) vMntDerogPi = '';
+	 if (vMntDerogAnego == null) vMntDerogAnego = '';
+	 if (vDetailValDerog1 == null) vDetailValDerog1 = '';
+	 if (vStatDerog2 == null) vStatDerog2 = '';
+	 if (vDetailValDerog3 == null) vDetailValDerog3 = '';
+	 if (vUserValDerog1 == null) vUserValDerog1 = '';
+	 if (vDetailValDerog2 == null) vDetailValDerog2 = '';
+	 if (vMntDerogMarge == null) vMntDerogMarge = '';
+	 if (vTypeDerog == null) vTypeDerog = '';
+	 if (vDeviseDepassDerog == null) vDeviseDepassDerog = '';
+	 if (vDeviseDerogMarge == null) vDeviseDerogMarge = '';
+	 if (vUserValDerog3 == null) vUserValDerog3 = '';
+	 if (vAppelDerog == null) vAppelDerog = '';
+	 if (vMntDerogTq == null) vMntDerogTq = '';
+	 if (vValDepassDerog == null) vValDepassDerog = '';
+	 if (vMntDerogNego == null) vMntDerogNego = '';
 	
-		if (CurrentRecord.IsUpdated("QuoExtStatDerog1") == true || CurrentRecord.IsUpdated("QuoExtStatDerog2") == true || CurrentRecord.IsUpdated("QuoExtStatDerog3") == true) {
-			if (vStatDerog1 == 'Approuvé' || vStatDerog1 == 'Refusé' || vStatDerog2 == 'Approuvé' || vStatDerog2 == 'Refusé' || (vStatDerog2 == 'Non approuvé' && vTypeDerog == 'Controle qualité') || vStatDerog3 == 'Approuvé' || vStatDerog3 == 'Non approuvé') {
-				var strSQL = "INSERT INTO x_derogation (dc0_nrid, xDateValDerog1, xDateValDerog3, xDeviseDerogTq, xDetailDemDerog, xStatDerog3, xUserValDerog2, xDeviseDerogPi, xStatDerog1, xMntDerogPi, xMntDerogAnego, xDateValDerog2, xDetailValDerog1, xStatDerog2, xDetailValDerog3, xUserValDerog1, xDetailValDerog2, xMntDerogMarge, xTypeDerog, xDeviseDepassDerog, xDeviseDerogMarge, xUserValDerog3, xAppelDerog, xMntDerogTq, xValDepassDerog, xMntDerogNego)" +
-					" VALUES ('" + nQuoNRID + "' , '" + vDateValDerog1 + "' , '" + vDateValDerog3 + "', '" + vDeviseDerogTq + "', '" + vDetailDemDerog + "', '" + vStatDerog3 + "', '" + vUserValDerog2 + "', '" + vDeviseDerogPi + "', '" + vStatDerog1 + "', '" + vMntDerogPi + "', '" + vMntDerogAnego + "', '" + vDateValDerog2 + "', '" + vDetailValDerog1 + "', '" + vStatDerog2 + "', '" + vDetailValDerog3 + "', '" + vUserValDerog1 + "', '" + vDetailValDerog2 + "', '" + vMntDerogMarge + "', '" + vTypeDerog + "', '" + vDeviseDepassDerog + "', '" + vDeviseDerogMarge + "', '" + vUserValDerog3 + "', '" + vAppelDerog + "', '" + vMntDerogTq + "', '" + vValDepassDerog + "', '" + vMntDerogNego + "')";
-				objReq.ExecuteSql(strSQL);
-			}
-		}
+	 if (CurrentRecord.IsUpdated("QuoExtStatDerog1") == true || CurrentRecord.IsUpdated("QuoExtStatDerog2") == true || CurrentRecord.IsUpdated("QuoExtStatDerog3") == true) {
+	  if (vStatDerog1 == 'Approuvé' || vStatDerog1 == 'Refusé' || vStatDerog2 == 'Approuvé' || vStatDerog2 == 'Refusé' || (vStatDerog2 == 'Non approuvé' && vTypeDerog == 'Controle qualité') || vStatDerog3 == 'Approuvé' || vStatDerog3 == 'Non approuvé') {
+	   var strSQL = "INSERT INTO x_derogation (dc0_nrid, xDateValDerog1, xDateValDerog3, xDeviseDerogTq, xDetailDemDerog, xStatDerog3, xUserValDerog2, xDeviseDerogPi, xStatDerog1, xMntDerogPi, xMntDerogAnego, xDateValDerog2, xDetailValDerog1, xStatDerog2, xDetailValDerog3, xUserValDerog1, xDetailValDerog2, xMntDerogMarge, xTypeDerog, xDeviseDepassDerog, xDeviseDerogMarge, xUserValDerog3, xAppelDerog, xMntDerogTq, xValDepassDerog, xMntDerogNego)" +
+	    " VALUES ('" + nQuoNRID + "' , '" + vDateValDerog1 + "' , '" + vDateValDerog3 + "', '" + vDeviseDerogTq + "', '" + vDetailDemDerog + "', '" + vStatDerog3 + "', '" + vUserValDerog2 + "', '" + vDeviseDerogPi + "', '" + vStatDerog1 + "', '" + vMntDerogPi + "', '" + vMntDerogAnego + "', '" + vDateValDerog2 + "', '" + vDetailValDerog1 + "', '" + vStatDerog2 + "', '" + vDetailValDerog3 + "', '" + vUserValDerog1 + "', '" + vDetailValDerog2 + "', '" + vMntDerogMarge + "', '" + vTypeDerog + "', '" + vDeviseDepassDerog + "', '" + vDeviseDerogMarge + "', '" + vUserValDerog3 + "', '" + vAppelDerog + "', '" + vMntDerogTq + "', '" + vValDepassDerog + "', '" + vMntDerogNego + "')";
+	   objReq.ExecuteSql(strSQL);
+	  }
+	 }
 	} catch (e) {
-		return strSQL + e.description;
+	 return strSQL + e.description;
 	} finally {
-		FreeSelligentObject(objReq);
-		objReq.Dispose();
+	 FreeSelligentObject(objReq);
+	 objReq.Dispose();
 	 }
 	
 		// -- BUYER ? QuoExtSRReqReason updated -------------------------------

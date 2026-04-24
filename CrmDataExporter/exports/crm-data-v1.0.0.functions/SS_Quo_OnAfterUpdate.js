@@ -140,156 +140,156 @@ function SS_Quo_OnAfterUpdate()
 	 delete oQryObj;
 	 Session["QUO_CREATE_AGEXP"] = false;
 		if (Session["SAP_VALID_NORM"] == true) {
-	 var vNumeroAaffaire = CurrentRecord["QuoOppReference"];
-	 var vNumeroAoffre = CurrentRecord["QuoCustReference"];
-	 var vValidationNormes = CurrentRecord["QuoExtValidationNormes"];
-	 var vCommentaireNorms = CurrentRecord["QuoExtNorDoc"];
-	 var vRapTest = CurrentRecord["QuoExtRapTest"];
-	 var vCommentairePack = CurrentRecord["QuoExtCommPack"];
-	 var vStatutPack = CurrentRecord["QuoExtStatutPack"];
-	 var vStatutRT = CurrentRecord["QuoExtStatutRT"];
+		var vNumeroAaffaire = CurrentRecord["QuoOppReference"];
+		var vNumeroAoffre = CurrentRecord["QuoCustReference"];
+		var vValidationNormes = CurrentRecord["QuoExtValidationNormes"];
+		var vCommentaireNorms = CurrentRecord["QuoExtNorDoc"];
+		var vRapTest = CurrentRecord["QuoExtRapTest"];
+		var vCommentairePack = CurrentRecord["QuoExtCommPack"];
+		var vStatutPack = CurrentRecord["QuoExtStatutPack"];
+		var vStatutRT = CurrentRecord["QuoExtStatutRT"];
 	
-	 if (vNumeroAaffaire == null) vNumeroAaffaire = "";
-	 if (vNumeroAoffre == null) vNumeroAoffre = "";
-	 if (vValidationNormes == null) vValidationNormes = "";
-	 if (vCommentaireNorms == null) vCommentaireNorms = "";
-	 if (vRapTest == null) vRapTest = "";
-	 if (vCommentairePack == null) vCommentairePack = "";
-	 if (vStatutPack == null) vStatutPack = "";
-	 if (vStatutRT == null) vStatutRT = "";
+		if (vNumeroAaffaire == null) vNumeroAaffaire = "";
+		if (vNumeroAoffre == null) vNumeroAoffre = "";
+		if (vValidationNormes == null) vValidationNormes = "";
+		if (vCommentaireNorms == null) vCommentaireNorms = "";
+		if (vRapTest == null) vRapTest = "";
+		if (vCommentairePack == null) vCommentairePack = "";
+		if (vStatutPack == null) vStatutPack = "";
+		if (vStatutRT == null) vStatutRT = "";
 	
-	 var vNRID;
-	 var vDT = CurrentRecord["ExtEchntlln1DateReception"];
+		var vNRID;
+		var vDT = CurrentRecord["ExtEchntlln1DateReception"];
 	
-	 var vValidNormes = ""
-	 switch (vValidationNormes) {
-	  case 'Totalement validé':
-	   vValidNormes = 'VT';
-	   break;
-	  case 'Non validé':
-	   vValidNormes = 'NV';
-	   break;
-	  case 'Partiellement validé':
-	   vValidNormes = 'VP';
-	   break;
-	  case 'Sans Normes':
-	   vValidNormes = 'SN';
-	   break;
-	  default:
-	   '';
-	 }
-	
-	
-	 var vStatP = ""
-	 switch (vStatutPack) {
-	  case 'En attente':
-	   vStatP = 'EA';
-	   break;
-	  case 'Envoyé pour validation':
-	   vStatP = 'EV';
-	   break;
-	  case 'Non Validé':
-	   vStatP = 'NV';
-	   break;
-	  case 'Validé':
-	   vStatP = 'VA';
-	   break;
-	  case 'En stand by':
-	   vStatP = 'SB';
-	   break;
-	  case 'Non reçu':
-	   vStatP = 'NR';
-	   break;
-	  case 'Sans Packaging':
-	   vStatP = 'SP';
-	   break;
-	  default:
-	   '';
-	 }
+		var vValidNormes = ""
+		switch (vValidationNormes) {
+			case 'Totalement validé':
+				vValidNormes = 'VT';
+				break;
+			case 'Non validé':
+				vValidNormes = 'NV';
+				break;
+			case 'Partiellement validé':
+				vValidNormes = 'VP';
+				break;
+			case 'Sans Normes':
+				vValidNormes = 'SN';
+				break;
+			default:
+				'';
+		}
 	
 	
-	 var vStatRT = ""
-	 switch (vStatutRT) {
-	  case 'Envoyé':
-	   vStatRT = 'EV';
-	   break;
-	  case 'Non conforme':
-	   vStatRT = 'NC';
-	   break;
-	  case 'Non Validé':
-	   vStatRT = 'NV';
-	   break;
-	  case 'Validé':
-	   vStatRT = 'VA';
-	   break;
-	  case 'Stand by':
-	   vStatRT = 'SB';
-	   break;
-	  case 'Non reçu':
-	   vStatRT = 'NR';
-	   break;
-	  default:
-	   '';
-	 }
+		var vStatP = ""
+		switch (vStatutPack) {
+			case 'En attente':
+				vStatP = 'EA';
+				break;
+			case 'Envoyé pour validation':
+				vStatP = 'EV';
+				break;
+			case 'Non Validé':
+				vStatP = 'NV';
+				break;
+			case 'Validé':
+				vStatP = 'VA';
+				break;
+			case 'En stand by':
+				vStatP = 'SB';
+				break;
+			case 'Non reçu':
+				vStatP = 'NR';
+				break;
+			case 'Sans Packaging':
+				vStatP = 'SP';
+				break;
+			default:
+				'';
+		}
 	
-	 var RapT = "";
-	 switch (vRapTest) {
-	  case "Obligatoire":
-	   RapT = 'X';
-	   break;
-	  case "Non Obligatoire":
-	   RapT = 'N';
-	   break;
-	  default:
-	   '';
-	 }
 	
-	 var vXmlRequest = " <soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:urn='urn:sap-com:document:sap:soap:functions:mc-style'>" +
-	  "     <soapenv:Header/>" +
-	  "     <soapenv:Body>" +
-	  "     <urn:ZCrmNorms>" +
-	  "     <ComCondTrans>" + vStatRT + "</ComCondTrans>" +
-	  "   <CommentPal>" + RapT + "</CommentPal>" +
-	  "     <Zcomfinv>" + vCommentairePack.replace(/[&\\\#,+()~%."*?<>{}]/g, "") + "</Zcomfinv>" +
-	  "     <Zcons>" + vCommentaireNorms.replace(/[&\\\#,+()~%."*?<>{}]/g, "") + "</Zcons>" +
-	  "     <ZfinvAssist>" + vStatP + "</ZfinvAssist>" +
-	  "     <Zvcns>" + vValidNormes + "</Zvcns>" +
-	  "     <Zzaffai>" + vNumeroAaffaire + "</Zzaffai>" +
-	  "     <Zzangnr>" + vNumeroAoffre + "</Zzangnr>" +
-	  "     <ZdatePackaging>" + vDateValidPack + "</ZdatePackaging>" +
-	  "     <ZdateValRt>" + vDateValRt + "</ZdateValRt>" +
-	  "     </urn:ZCrmNorms>" +
-	  "     </soapenv:Body>" +
-	  "  </soapenv:Envelope>";
+		var vStatRT = ""
+		switch (vStatutRT) {
+			case 'Envoyé':
+				vStatRT = 'EV';
+				break;
+			case 'Non conforme':
+				vStatRT = 'NC';
+				break;
+			case 'Non Validé':
+				vStatRT = 'NV';
+				break;
+			case 'Validé':
+				vStatRT = 'VA';
+				break;
+			case 'Stand by':
+				vStatRT = 'SB';
+				break;
+			case 'Non reçu':
+				vStatRT = 'NR';
+				break;
+			default:
+				'';
+		}
 	
-	 if (!no_SAP_WS) {
-	  objRequest = System.Net.HttpWebRequest(System.Net.WebRequest.Create(vUrlWebService));
-	  objRequest.Method = "POST";
-	  objRequest.Credentials = new System.Net.NetworkCredential("SP_ADMIN", "4Dm1N5p@!");
-	  objRequest.ContentType = "text/xml; charset=utf-8";
+		var RapT = "";
+		switch (vRapTest) {
+			case "Obligatoire":
+				RapT = 'X';
+				break;
+			case "Non Obligatoire":
+				RapT = 'N';
+				break;
+			default:
+				'';
+		}
 	
-	  var data = System.Text.Encoding.ASCII.GetBytes(vXmlRequest);
-	  objRequest.ContentLength = data.Length; // Set the 'ContentLength' property of the WebRequest.
-	  var stream = objRequest.GetRequestStream(); // Fournit une vue générique d'une séquence d'octets d'un Request
-	  stream.Write(data, 0, data.Length); // injecter les données dans la vue générique
-	  stream.Close(); // fermer la vue générique
-	  oResponse = objRequest.GetResponse(); // returns a response to an Internet request
+		var vXmlRequest = " <soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:urn='urn:sap-com:document:sap:soap:functions:mc-style'>" +
+			"     <soapenv:Header/>" +
+			"     <soapenv:Body>" +
+			"     <urn:ZCrmNorms>" +
+			"     <ComCondTrans>" + vStatRT + "</ComCondTrans>" +
+			"   <CommentPal>" + RapT + "</CommentPal>" +
+			"     <Zcomfinv>" + vCommentairePack.replace(/[&\\\#,+()~%."*?<>{}]/g, "") + "</Zcomfinv>" +
+			"     <Zcons>" + vCommentaireNorms.replace(/[&\\\#,+()~%."*?<>{}]/g, "") + "</Zcons>" +
+			"     <ZfinvAssist>" + vStatP + "</ZfinvAssist>" +
+			"     <Zvcns>" + vValidNormes + "</Zvcns>" +
+			"     <Zzaffai>" + vNumeroAaffaire + "</Zzaffai>" +
+			"     <Zzangnr>" + vNumeroAoffre + "</Zzangnr>" +
+			"     <ZdatePackaging>" + vDateValidPack + "</ZdatePackaging>" +
+			"     <ZdateValRt>" + vDateValRt + "</ZdateValRt>" +
+			"     </urn:ZCrmNorms>" +
+			"     </soapenv:Body>" +
+			"  </soapenv:Envelope>";
 	
-	  oStream = oResponse.GetResponseStream(); // Fournit une vue générique d'une séquence d'octets d'une Reponse
-	  oStreamReader = new System.IO.StreamReader(oStream, System.Text.Encoding.UTF8); // reads characters from a byte stream in a particular encoding
+		if (!no_SAP_WS) {
+			objRequest = System.Net.HttpWebRequest(System.Net.WebRequest.Create(vUrlWebService));
+			objRequest.Method = "POST";
+			objRequest.Credentials = new System.Net.NetworkCredential("SP_ADMIN", "4Dm1N5p@!");
+			objRequest.ContentType = "text/xml; charset=utf-8";
 	
-	  var result = oStreamReader.ReadToEnd(); // récupérer toute la réponse
-	  var vReqInsertLog = "insert into xlog_ws (xmethod, xappel, xretour, xdebug, xdate_log) values('ZCrmNorms', '" + vXmlRequest.replace(/'/g, "''") + "', '" + result.replace(/'/g, "''") + "', '', getdate()) ";
+			var data = System.Text.Encoding.ASCII.GetBytes(vXmlRequest);
+			objRequest.ContentLength = data.Length; // Set the 'ContentLength' property of the WebRequest.
+			var stream = objRequest.GetRequestStream(); // Fournit une vue générique d'une séquence d'octets d'un Request
+			stream.Write(data, 0, data.Length); // injecter les données dans la vue générique
+			stream.Close(); // fermer la vue générique
+			oResponse = objRequest.GetResponse(); // returns a response to an Internet request
 	
-	  var vResReq = objSQL.ExecuteSql(vReqInsertLog);
+			oStream = oResponse.GetResponseStream(); // Fournit une vue générique d'une séquence d'octets d'une Reponse
+			oStreamReader = new System.IO.StreamReader(oStream, System.Text.Encoding.UTF8); // reads characters from a byte stream in a particular encoding
 	
-	  Selligent.Library.Monitor.Tracer.Write("HAAAAAAAAAAAAAAAAAAAAAS MAJ ZCrmNorms V9", false);
-	  Selligent.Library.Monitor.Tracer.Write(result, false);
-	  oStreamReader.Close();
-	  //return result ;
-	  objSQL.Dispose();
-	  FreeSelligentObject(objSQL);
-	 }
+			var result = oStreamReader.ReadToEnd(); // récupérer toute la réponse
+			var vReqInsertLog = "insert into xlog_ws (xmethod, xappel, xretour, xdebug, xdate_log) values('ZCrmNorms', '" + vXmlRequest.replace(/'/g, "''") + "', '" + result.replace(/'/g, "''") + "', '', getdate()) ";
+	
+			var vResReq = objSQL.ExecuteSql(vReqInsertLog);
+	
+			Selligent.Library.Monitor.Tracer.Write("HAAAAAAAAAAAAAAAAAAAAAS MAJ ZCrmNorms V9", false);
+			Selligent.Library.Monitor.Tracer.Write(result, false);
+			oStreamReader.Close();
+			//return result ;
+			objSQL.Dispose();
+			FreeSelligentObject(objSQL);
+		}
 	}
 		if (Session["SAP_DETAIL_COM"] == true) {
 	  // HAS : DEB - 02/10/2019 - récupérer le passeport de phytosanitaire du fournisseur
@@ -427,7 +427,25 @@ function SS_Quo_OnAfterUpdate()
 	    FreeSelligentObject(objSQL);
 	    objSQL.Dispose();
 	  }
+	
+	  try{
+	    SS_App_UpdateStatus(vNumeroAoffre, 1);
+	  }
+	  catch(e){
+	    Selligent.Library.Monitor.Tracer.Write("ERREUR MAJ STATUS FICHE TAQUET" + e.message, false);
+	  }
+	
+	
 	}
+		if (Session.Exists("SAP_FICHE_TAQ") && Session["SAP_FICHE_TAQ"] == true)  
+	    {      
+	    Selligent.Library.Monitor.Tracer.Write("SESSION SAP_FICHE_TAQ TRUE !!");        
+	    var nrid = CurrentRecord["QuoNRID"];      
+	    var vRetour = WS_Send_FicheTaquet(nrid);        
+	    Session["SAP_FICHE_TAQ"] = false;  
+	    
+	    }
+	
 		if (Session["SAP_DETAIL_DEM"] == true) {
 	 var vQuoExtDateDem = CurrentRecord["QuoExtDateDemDeposit"];
 	 var demdeposit = CurrentRecord["QuoExtDemdep"];

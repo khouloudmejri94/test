@@ -33,7 +33,7 @@ public sealed class CrmExportService
         // Crée le dossier de sortie s'il n'existe pas encore
         Directory.CreateDirectory(outputDirectory);
 
-        // ── 1. Export JSON 
+        // 1. Export JSON 
         // Exclut function_text du JSON global pour alléger le fichier.
         // Les textes des fonctions sont exportés séparément dans le dossier (.functions).
         var sanitized = records.Select(r => new
@@ -51,7 +51,7 @@ public sealed class CrmExportService
         string jsonContent = JsonSerializer.Serialize(sanitized, new JsonSerializerOptions { WriteIndented = true });
         await File.WriteAllTextAsync(jsonPath, jsonContent);
 
-        // ── 2. Export (fichiers .js) séparés
+        // 2. Export (fichiers .js) séparés
         // Crée un dossier crm-data-{version}.functions
         // Chaque enregistrement ayant un function_text devient un fichier .js individuel
         string functionsDir = Path.Combine(outputDirectory, $"crm-data-{version}.functions");
