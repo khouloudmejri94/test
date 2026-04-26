@@ -14,11 +14,12 @@ if (string.IsNullOrWhiteSpace(connectionString))
 string command = args.Length > 0 ? args[0] : "import";
 string tableName = args.Length > 1 ? args[1] : "sysadm.scr0";
 
+bool exportAll = args.Any(a => string.Equals(a, "--all", StringComparison.OrdinalIgnoreCase));
 
 switch (command)
 {
     case "export":
-        await ExportCommand.RunAsync(tableName, outputDirectory, connectionString);
+        await ExportCommand.RunAsync(tableName, outputDirectory, connectionString, exportAll);
         break;
 
     case "import":

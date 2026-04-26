@@ -42,7 +42,11 @@ public sealed class CrmExportService
             r.LangId, r.TierId
         }).ToList();
 
-        string jsonPath = Path.Combine(outputDirectory, $"crm-data.json");
+        const string dataFileName = "crm-data.json";
+        const string functionsDirName = "crm-data.functions";
+        const string manifestFileName = "crm-data-manifest.json";
+
+        string jsonPath = Path.Combine(outputDirectory, dataFileName);
 
         // Sérialise avec indentation pour lisibilité humaine
         string jsonContent = JsonSerializer.Serialize(sanitized, new JsonSerializerOptions { WriteIndented = true });
@@ -50,7 +54,7 @@ public sealed class CrmExportService
 
         // 2. Export (fichiers .js) séparés
         // Chaque enregistrement ayant un function_text devient un fichier .js individuel
-        string functionsDir = Path.Combine(outputDirectory, $"crm-data.functions");
+        string functionsDir = Path.Combine(outputDirectory, functionsDirName);
         Directory.CreateDirectory(functionsDir);
 
         foreach (CrmRecord record in records.Where(r => !string.IsNullOrWhiteSpace(r.FunctionText)))
@@ -60,25 +64,22 @@ public sealed class CrmExportService
             await File.WriteAllTextAsync(Path.Combine(functionsDir, fileName), record.FunctionText!);
         }
 
-        string manifestPath = Path.Combine(outputDirectory, $"crm-data-manifest.json");
+        var manifest = new ExportManifest
+        {
+            CreatedAtUtc = DateTime.UtcNow,
+            // Chemins relatifs au dossier d'export (portable + friendly Git)
+            DataFile = dataFileName,
+            FunctionsDirectory = functionsDirName,
+            RecordCount = records.Count,
+        };
+
+        string manifestPath = Path.Combine(outputDirectory, manifestFileName);
         string manifestContent = JsonSerializer.Serialize(
-            new ExportManifest
-            {
-                CreatedAtUtc = DateTime.UtcNow,
-                DataFile = jsonPath,
-                FunctionsDirectory = functionsDir, 
-                RecordCount = records.Count,
-            },
+            manifest,
             new JsonSerializerOptions { WriteIndented = true });
 
         await File.WriteAllTextAsync(manifestPath, manifestContent);
-        // 4. Retourne le manifest de l'export 
-        return new ExportManifest
-        {
-            CreatedAtUtc = DateTime.UtcNow,
-            DataFile = jsonPath,
-            RecordCount = records.Count
-        };
+        return manifest;
     }
 
     /// <summary>

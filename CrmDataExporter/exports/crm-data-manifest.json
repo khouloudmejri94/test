@@ -1,5 +1,6 @@
 {
-  "CreatedAtUtc": "2026-04-24T13:17:36.9118866Z",
-  "DataFile": "C:\\Users\\khouloud.mejri\\RiderProjects\\CrmDataExporter\\CrmDataExporter\\bin\\Debug\\net8.0\\..\\..\\..\\exports\\crm-data.json",
+  "FunctionsDirectory": "crm-data.functions",
+  "CreatedAtUtc": "2026-04-26T17:47:56.8089833Z",
+  "DataFile": "crm-data.json",
   "RecordCount": 1
 }

@@ -15,11 +15,17 @@ public static class ImportCommand
         // Affiche le début de l'import
         Console.WriteLine($"Import en cours : → {tableName}");
 
+        // Date du dernier import (pour n'appliquer que les .js modifiés depuis)
+        DateTime? lastImportDate = ImportHistory.GetLastImportDateUtc(outputDirectory);
+
+        // Sécurise le nom de la table (même logique que l'export)
+        string safeTable = SqlHelper.BuildSafeSqlTableName(tableName);
+
         // Initialise le service d'import
         var importer = new CrmImportService();
 
         // Lance l'import des données depuis les fichiers exportés vers la base de données
-        var result = await importer.ImportAsync(outputDirectory, connectionString, tableName);
+        var result = await importer.ImportAsync(outputDirectory, connectionString, safeTable, lastImportDate);
 
         // Affiche les résultats de l'import
         Console.WriteLine($"Import terminé.");
@@ -44,4 +50,5 @@ public static class ImportCommand
         // Affiche le chemin du fichier généré
         Console.WriteLine($"  Fichier    : {manifestPath}");
     }
+
 }
