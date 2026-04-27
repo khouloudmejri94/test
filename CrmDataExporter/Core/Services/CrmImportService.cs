@@ -122,17 +122,21 @@ public sealed class CrmImportService
                         continue;
 
                     DateTime newDmod = DateTime.UtcNow;
-                    string targetFunctionName = functionName;
-                    int affected = await UpdateFunctionTextByFunctionNameAsync(
-                        connection, transaction, safeTableName, targetFunctionName, newDmod, jsText);
+                    string[] candidates = functionName.StartsWith("__", StringComparison.Ordinal)
+                        ? [functionName, functionName.TrimStart('_')]
+                        : [functionName, $"__{functionName}"];
 
-                    // Supporte le cas où le fichier est sans "__" mais la base utilise "__"
-                    if (affected <= 0 && !targetFunctionName.StartsWith("__", StringComparison.Ordinal))
+                    int affected = 0;
+                    string targetFunctionName = functionName;
+                    foreach (string candidate in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
                     {
                         affected = await UpdateFunctionTextByFunctionNameAsync(
-                            connection, transaction, safeTableName, $"__{targetFunctionName}", newDmod, jsText);
+                            connection, transaction, safeTableName, candidate, newDmod, jsText);
                         if (affected > 0)
-                            targetFunctionName = $"__{targetFunctionName}";
+                        {
+                            targetFunctionName = candidate;
+                            break;
+                        }
                     }
 
                     if (affected <= 0)
@@ -328,12 +332,7 @@ public sealed class CrmImportService
             }
 
             string funcName = Path.GetFileNameWithoutExtension(jsFile);
-            string content = await File.ReadAllTextAsync(jsFile);
-
-            // Le CRM peut avoir des noms de fonctions avec préfixe "__" alors que le fichier est sans préfixe
-            functionTexts[funcName] = content;
-            if (!funcName.StartsWith("__", StringComparison.Ordinal) && !functionTexts.ContainsKey($"__{funcName}"))
-                functionTexts[$"__{funcName}"] = content;
+            functionTexts[funcName] = await File.ReadAllTextAsync(jsFile);
         }
 
         return functionTexts;
@@ -349,13 +348,20 @@ public sealed class CrmImportService
         {
             if (!string.IsNullOrWhiteSpace(r.FunctionName))
             {
-                // Match exact ou via variante "__"
+                // Match exact + fallback avec/sans "__"
                 if (functionTexts.TryGetValue(r.FunctionName, out var text))
                     return r with { FunctionText = text };
 
-                if (r.FunctionName.StartsWith("__", StringComparison.Ordinal) &&
-                    functionTexts.TryGetValue(r.FunctionName.TrimStart('_'), out var noPrefix))
-                    return r with { FunctionText = noPrefix };
+                if (r.FunctionName.StartsWith("__", StringComparison.Ordinal))
+                {
+                    if (functionTexts.TryGetValue(r.FunctionName.TrimStart('_'), out var noPrefix))
+                        return r with { FunctionText = noPrefix };
+                }
+                else
+                {
+                    if (functionTexts.TryGetValue($"__{r.FunctionName}", out var withPrefix))
+                        return r with { FunctionText = withPrefix };
+                }
             }
 
             return r;
